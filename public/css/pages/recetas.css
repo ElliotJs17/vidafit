@@ -1106,6 +1106,15 @@ body {
   max-width: 900px;
 }
 
+.receta-detalle-imagen {
+  display: flex;
+  justify-content: center;
+}
+
+.receta-detalle-imagen img {
+  border-radius: 20px;
+}
+
 .receta-detalle-header {
   margin-bottom: var(--space-lg);
 }
