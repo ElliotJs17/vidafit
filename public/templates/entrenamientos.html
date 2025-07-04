@@ -1,0 +1,49 @@
+<div class="container">
+        <div class="main-content">
+            <div class="header">
+                <h1>🏋️‍♂️ VidaFit</h1>
+                <p>Crea tu rutina de entrenamiento personalizada</p>
+            </div>
+            <div class="filtros-section">
+                <h2>🎯 Filtrar entrenamientos</h2>
+                <div class="filtros-container">
+                    <button class="filtro-btn activo" data-tipo="todos">Todos</button>
+                    <button class="filtro-btn" data-tipo="cardio">Cardio</button>
+                    <button class="filtro-btn" data-tipo="fuerza">Fuerza</button>
+                    <button class="filtro-btn" data-tipo="flexibilidad">Flexibilidad</button>
+                    <button class="filtro-btn" data-tipo="yoga">Yoga</button>
+                    <button class="filtro-btn" data-tipo="hiit">HIIT</button>
+                    <button class="filtro-btn" data-tipo="pilates">Pilates</button>
+                </div>
+            </div>
+
+            <div class="contador-section">
+                <div class="contador" id="contador-seleccionados">
+                    <span class="contador-numero">0</span>
+                    <span>entrenamientos seleccionados</span>
+                </div>
+            </div>
+
+            <div id="lista-entrenamientos">
+                <div class="loading">Cargando entrenamientos...</div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="vista-previa" id="vista-previa-rutina">
+                <h3>📝 Rutina personalizada</h3>
+                <div id="entrenamientos-seleccionados">
+                    <div class="rutina-empty">
+                        Selecciona entrenamientos para crear tu rutina personalizada
+                    </div>
+                </div>
+
+                <div class="acciones-rutina">
+                    <input type="text" id="nombre-rutina" placeholder="Nombre de tu rutina (ej. Rutina Matutina)" />
+                    <button class="btn-guardar" id="guardar-rutina-btn" disabled>
+                        💾 Guardar Rutina
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,460 @@
+:root {
+  /* Tonos base */
+  --primary-color: #2ecc71;         /* Verde brillante */
+  --primary-dark: #27ae60;          /* Verde oscuro */
+  --primary-light: #81c784;         /* Verde claro */
+  
+  /* Texto y fondo */
+  --text-color: #333;
+  --bg-color: #f8f9fa;
+  --card-bg: #ffffff;
+
+  /* Otros */
+  --border-color: #e9ecef;
+  --accent-color: var(--primary-color);
+  --badge-text: #fff;
+  --shadow-color: rgba(46, 204, 113, 0.2); /* Sombra verde */
+}
+
+.container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            min-height: calc(100vh - 40px);
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Filtros */
+        .filtros-section {
+            margin-bottom: 30px;
+        }
+
+        .filtros-section h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filtros-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filtro-btn {
+            padding: 12px 24px;
+            border: 2px solid transparent;
+            background: #f8f9fa;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filtro-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .filtro-btn:hover::before {
+            left: 100%;
+        }
+
+        .filtro-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .filtro-btn.activo {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Contador */
+        .contador-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+
+        .contador {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .contador-numero {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+        }
+
+        /* Lista de entrenamientos */
+        #lista-entrenamientos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .entrenamiento-card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .entrenamiento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .entrenamiento-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .entrenamiento-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color:  --primary-light;
+        }
+
+        .entrenamiento-card.seleccionado {
+            border-color:  --primary-light;
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .entrenamiento-card.seleccionado::before {
+            transform: scaleX(1);
+        }
+
+        .entrenamiento-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .entrenamiento-checkbox {
+            width: 24px;
+            height: 24px;
+            accent-color:  --primary-light;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+
+        .entrenamiento-info {
+            flex: 1;
+        }
+
+        .entrenamiento-titulo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .tipo-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .tipo-cardio { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+        .tipo-fuerza { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+        .tipo-flexibilidad { background: linear-gradient(135deg, #55efc4, #00b894); }
+        .tipo-yoga { background: linear-gradient(135deg, #fd79a8, #e84393); }
+        .tipo-hiit { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+        .tipo-pilates { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
+
+        .entrenamiento-descripcion {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .entrenamiento-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .stat-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        /* Vista previa */
+        .vista-previa {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .vista-previa h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rutina-empty {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 40px 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+        }
+
+        .entrenamiento-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid --primary-color;
+            transition: all 0.3s ease;
+        }
+
+        .entrenamiento-preview:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+
+        .preview-titulo {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .preview-descripcion {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Acciones */
+        .acciones-rutina {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #nombre-rutina {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        #nombre-rutina:focus {
+            outline: none;
+            border-color: --primary-color;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-guardar {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #00b894, #55efc4);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-guardar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-guardar:hover::before {
+            left: 100%;
+        }
+
+        .btn-guardar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 184, 148, 0.4);
+        }
+
+        .btn-guardar:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid --primary-color;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .sidebar {
+                position: static;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .main-content,
+            .sidebar {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .filtros-container {
+                justify-content: center;
+            }
+            
+            #lista-entrenamientos {
+                grid-template-columns: 1fr;
+            }
+            
+            .entrenamiento-stats {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
