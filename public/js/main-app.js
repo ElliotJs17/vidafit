@@ -20,9 +20,9 @@ const ROUTES = {
     script: "./pages/recetas/recetas.js",
   },
   entrenamientos: {
-    template: "/templates/entrenamientos.html",
-    styles: "/css/pages/entrenamientos.css",
-    script: "/js/pages/entrenamientos.js",
+    template: "./templates/entrenamientos.html",
+    styles: "./css/pages/entrenamientos.css",
+    script: "./pages/entrenamientos/entrenamientos.js",
   },
   perfil: {
     template: "./templates/perfil.html",
