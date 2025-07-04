@@ -1,0 +1,178 @@
+<div class="page-content profile-page">
+  <h2 class="profile-title">Mi Perfil</h2>
+
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <div class="avatar-preview" id="avatar-preview">
+          <img id="avatar-image" src="" alt="Avatar" />
+          <div class="avatar-overlay">
+            <i class="fas fa-camera"></i>
+          </div>
+        </div>
+        <input type="file" id="avatar-upload" accept="image/*" />
+        <button id="change-avatar-btn" class="btn-secondary">
+          <i class="fas fa-upload"></i> Cambiar Foto
+        </button>
+      </div>
+      <div class="profile-basic-info">
+        <h3 id="profile-display-name">Usuario</h3>
+        <p id="profile-email">usuario@ejemplo.com</p>
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="profile-age">--</span>
+            <span class="stat-label">Edad</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="profile-height">--</span>
+            <span class="stat-label">cm</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="profile-weight">--</span>
+            <span class="stat-label">kg</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="profile-bmi">--</span>
+            <span class="stat-label">IMC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="profile-form" class="profile-form">
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-user"></i> Información Personal
+        </h3>
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="display-name">Username</label>
+            <input type="text" id="display-name" required />
+          </div>
+
+          <div class="input-group">
+            <label for="first-name">Nombre</label>
+            <input type="text" id="first-name" />
+          </div>
+
+          <div class="input-group">
+            <label for="last-name">Apellido</label>
+            <input type="text" id="last-name" />
+          </div>
+
+          <div class="input-group">
+            <label for="gender">Género</label>
+            <select id="gender">
+              <option value="">Seleccionar</option>
+              <option value="male">Masculino</option>
+              <option value="female">Femenino</option>
+              <option value="other">Otro</option>
+              <option value="prefer-not-to-say">Prefiero no decir</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="birthdate">Fecha de nacimiento</label>
+            <input type="date" id="birthdate" />
+          </div>
+
+          <div class="input-group">
+            <label for="phone">Teléfono</label>
+            <input type="tel" id="phone" pattern="[0-9]{9}" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-chart-line"></i> Medidas Corporales
+        </h3>
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="height">Estatura (cm)</label>
+            <input type="number" id="height" min="100" max="250" />
+          </div>
+
+          <div class="input-group">
+            <label for="weight">Peso (kg)</label>
+            <input type="number" id="weight" min="30" max="300" step="0.1" />
+          </div>
+
+          <div class="input-group">
+            <label for="waist">Circunferencia de cintura (cm)</label>
+            <input type="number" id="waist" min="50" max="200" step="0.1" />
+          </div>
+
+          <div class="input-group">
+            <label for="hip">Circunferencia de cadera (cm)</label>
+            <input type="number" id="hip" min="60" max="250" step="0.1" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-heart"></i> Salud y Objetivos
+        </h3>
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="activity-level">Nivel de actividad</label>
+            <select id="activity-level">
+              <option value="">Seleccionar</option>
+              <option value="sedentary">Sedentario</option>
+              <option value="light">Ligero (ejercicio 1-3 días/semana)</option>
+              <option value="moderate">
+                Moderado (ejercicio 3-5 días/semana)
+              </option>
+              <option value="active">Activo (ejercicio 6-7 días/semana)</option>
+              <option value="very-active">
+                Muy activo (ejercicio intenso diario)
+              </option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="fitness-goal">Objetivo de fitness</label>
+            <select id="fitness-goal">
+              <option value="">Seleccionar</option>
+              <option value="weight-loss">Pérdida de peso</option>
+              <option value="muscle-gain">Ganancia muscular</option>
+              <option value="maintenance">Mantenimiento</option>
+              <option value="improve-endurance">Mejorar resistencia</option>
+              <option value="improve-flexibility">Mejorar flexibilidad</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="medical-conditions"
+              >Condiciones médicas (opcional)</label
+            >
+            <textarea id="medical-conditions" rows="3"></textarea>
+          </div>
+
+          <div class="input-group">
+            <label for="allergies">Alergias (opcional)</label>
+            <textarea id="allergies" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" id="edit-btn" class="btn-primary">
+          <i class="fas fa-edit"></i> Editar Perfil
+        </button>
+        <button type="submit" id="save-btn" class="btn-primary" disabled>
+          <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+        <button
+          type="button"
+          id="cancel-btn"
+          class="btn-secondary"
+          style="display: none"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,224 @@
+/* Variables CSS */
+:root {
+  --primary-color: #66bb6a;
+  --primary-dark: #4caf50;
+  --primary-light: #81c784;
+  --text-color: #f0f8ff;
+  --text-secondary: #b0c4de;
+  --bg-dark: rgba(20, 25, 30, 0.98);
+  --bg-light: rgba(35, 45, 55, 0.98);
+  --border-color: rgba(255, 255, 255, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --transition-fast: 0.3s ease;
+  --transition-slow: 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Reset y estilos base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: "Montserrat", sans-serif;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* Layout */
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: url("../img/background-login.jpg") no-repeat center center / cover;
+  position: relative;
+  z-index: 1;
+}
+
+.background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8),
+    rgba(29, 39, 49, 0.85)
+  );
+  z-index: 2;
+}
+
+.auth-container {
+  background: linear-gradient(135deg, var(--bg-light), var(--bg-dark));
+  padding: 50px;
+  border-radius: 18px;
+  box-shadow: 0 20px 40px var(--shadow-color),
+    0 0 0 2px rgba(102, 187, 106, 0.2);
+  text-align: center;
+  width: 500px;
+  max-width: 90%;
+  position: relative;
+  z-index: 3;
+  transition: all var(--transition-slow);
+}
+
+/* Header */
+.auth-header {
+  margin-bottom: 40px;
+}
+
+.auth-app-logo {
+  font-size: 3.5em;
+  margin: 0 0 10px 0;
+  color: var(--primary-color);
+  font-weight: 700;
+  text-shadow: 0 0 15px rgba(102, 187, 106, 0.4);
+}
+
+.form-title {
+  font-size: 2.2em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.auth-subtitle {
+  font-size: 1em;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Formularios */
+.auth-form {
+  transition: opacity var(--transition-slow), transform var(--transition-slow);
+}
+
+.auth-form.hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transform: translateY(20px);
+  pointer-events: none;
+  position: absolute;
+  width: calc(100% - 100px);
+  left: 50px;
+}
+
+.input-group {
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.95em;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 18px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 1.05em;
+  color: var(--text-color);
+  transition: all var(--transition-fast);
+}
+
+.input-group input:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 255, 255, 0.15);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.25),
+    0 0 10px rgba(102, 187, 106, 0.3);
+}
+
+/* Botones */
+.btn-primary {
+  background: linear-gradient(
+    45deg,
+    var(--primary-color) 0%,
+    var(--primary-dark) 100%
+  );
+  color: white;
+  padding: 16px 35px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.15em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 60%;
+  margin-top: 30px;
+  box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(
+    45deg,
+    var(--primary-dark) 0%,
+    var(--primary-color) 100%
+  );
+  transform: translateY(-7px);
+  box-shadow: 0 15px 30px var(--shadow-color);
+}
+
+/* Footer */
+.auth-footer {
+  margin-top: 40px;
+  font-size: 0.95em;
+  color: var(--text-secondary);
+}
+
+.auth-footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.auth-footer a:hover {
+  color: var(--primary-light);
+  text-decoration: underline;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 40px;
+    width: 85%;
+  }
+
+  .auth-app-logo {
+    font-size: 3em;
+  }
+
+  /* ... (otros estilos responsive similares a los originales) ... */
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 25px;
+    width: 95%;
+  }
+
+  /* ... (otros estilos responsive para móviles) ... */
+}
+
+@media screen and (orientation: landscape) and (max-height: 550px) {
+  .auth-wrapper {
+    align-items: flex-start;
+    padding: 20px 0;
+  }
+
+  /* ... (otros estilos para landscape) ... */
+}

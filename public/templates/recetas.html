@@ -1,0 +1,506 @@
+<div class="recetas-page">
+  <!-- Sidebar de filtrado mejorado -->
+  <aside class="filtros-sidebar">
+    <div class="sidebar-header">
+      <h3><span class="icon-filter">🔍</span> Filtrar Recetas</h3>
+      <p class="sidebar-subtitle">Encuentra recetas según tus preferencias</p>
+    </div>
+
+    <div class="filtros-container">
+      <div class="filtro-group">
+        <label for="filtro-categoria" class="filtro-label">
+          <span class="icon-label">🍽️</span> Categoría
+        </label>
+        <select id="filtro-categoria" class="filtro-select">
+          <option value="">Todas las categorías</option>
+          <option value="Desayuno">🌅 Desayuno</option>
+          <option value="Almuerzo">🍽️ Almuerzo</option>
+          <option value="Cena">🌙 Cena</option>
+          <option value="Snack">🍪 Snack</option>
+        </select>
+      </div>
+
+      <div class="filtro-group">
+        <label for="filtro-dificultad" class="filtro-label">
+          <span class="icon-label">📊</span> Dificultad
+        </label>
+        <select id="filtro-dificultad" class="filtro-select">
+          <option value="">Todas las dificultades</option>
+          <option value="Fácil">⭐ Fácil</option>
+          <option value="Media">⭐⭐ Media</option>
+          <option value="Difícil">⭐⭐⭐ Difícil</option>
+        </select>
+      </div>
+
+      <div class="filtro-group">
+        <label for="filtro-tiempo" class="filtro-label">
+          <span class="icon-label">⏱️</span> Tiempo máximo
+        </label>
+        <select id="filtro-tiempo" class="filtro-select">
+          <option value="">Cualquier tiempo</option>
+          <option value="15">⚡ Hasta 15 min</option>
+          <option value="30">🕐 Hasta 30 min</option>
+          <option value="60">🕑 Hasta 1 hora</option>
+        </select>
+      </div>
+
+      <div class="filtro-group">
+        <label for="filtro-calorias" class="filtro-label">
+          <span class="icon-label">🔥</span> Calorías máximas
+        </label>
+        <select id="filtro-calorias" class="filtro-select">
+          <option value="">Cualquier cantidad</option>
+          <option value="200">🍃 Hasta 200 cal</option>
+          <option value="400">🔥 Hasta 400 cal</option>
+          <option value="600">💪 Hasta 600 cal</option>
+        </select>
+      </div>
+
+      <button
+        id="limpiar-filtros"
+        class="btn-limpiar"
+        aria-label="Limpiar todos los filtros"
+      >
+        <span class="btn-icon">🗑️</span>
+        <span class="btn-text">Limpiar Filtros</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido principal mejorado -->
+  <main class="recetas-content">
+    <header class="repo-header">
+      <div class="header-left">
+        <h1><span class="icon-title">📖</span> Repositorio de Recetas</h1>
+        <p class="subtitle">Descubre, crea y comparte tus recetas saludables</p>
+      </div>
+      <div class="search-container">
+        <div class="search-box" role="search">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Buscar recetas, ingredientes..."
+            aria-label="Buscar recetas"
+          />
+          <button id="search-btn" type="button" aria-label="Buscar">
+            <span class="search-icon">🔍</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contador de resultados mejorado -->
+    <div
+      class="results-info"
+      id="results-info"
+      style="display: none"
+      aria-live="polite"
+    >
+      <span class="results-count" id="results-count">0</span>
+      <span class="results-text">recetas encontradas</span>
+    </div>
+
+    <!-- Loading state mejorado -->
+    <div class="loading-state" id="loading-state" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-text">Cargando recetas...</p>
+    </div>
+
+    <!-- Listado de recetas con mejor semántica -->
+    <section
+      class="recetas-grid"
+      id="recetas-grid"
+      aria-label="Listado de recetas"
+    >
+      <!-- Las recetas se cargarán dinámicamente -->
+    </section>
+
+    <!-- Estado vacío mejorado -->
+    <div
+      class="empty-state"
+      id="empty-state"
+      style="display: none"
+      aria-live="polite"
+    >
+      <div class="empty-illustration">
+        <div class="empty-icon" aria-hidden="true">🍳</div>
+      </div>
+      <h3 class="empty-title">¡Tu recetario está vacío!</h3>
+      <p class="empty-message">Comienza creando tu primera receta saludable</p>
+      <button
+        id="btn-crear-vacio"
+        class="btn-crear-vacio"
+        aria-label="Crear primera receta"
+      >
+        <span class="btn-icon">✨</span>
+        <span class="btn-text">Crear mi primera receta</span>
+      </button>
+    </div>
+
+    <!-- Sin resultados mejorado -->
+    <div
+      class="no-results"
+      id="no-results"
+      style="display: none"
+      aria-live="polite"
+    >
+      <div class="no-results-icon" aria-hidden="true">🔍</div>
+      <h3 class="no-results-title">No se encontraron recetas</h3>
+      <p class="no-results-message">
+        Intenta con otros términos de búsqueda o ajusta los filtros
+      </p>
+    </div>
+
+    <!-- Botón flotante mejorado -->
+    <button
+      id="abrir-modal"
+      class="btn-crear-floating"
+      aria-label="Crear nueva receta"
+    >
+      <span class="btn-icon">+</span>
+      <span class="btn-text">Nueva Receta</span>
+    </button>
+  </main>
+</div>
+
+<!-- Modal para crear/editar receta mejorado -->
+<div
+  class="modal-overlay"
+  id="modal-receta"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  style="display: none"
+>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 id="modal-title" class="modal-title">✨ Crear Nueva Receta</h2>
+      <button
+        class="modal-close"
+        id="close-modal"
+        type="button"
+        aria-label="Cerrar modal"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form id="form-receta" class="form-receta">
+        <!-- Información básica mejorada -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">📝</span> Información Básica
+          </h3>
+
+          <div class="form-group">
+            <label for="receta-imagen" class="form-label">
+              <span class="label-icon">🖼️</span> Imagen de la receta
+            </label>
+            <input
+              type="file"
+              id="receta-imagen"
+              class="form-input"
+              accept="image/*"
+              aria-describedby="image-help"
+            />
+            <small id="image-help" class="form-help">
+              Sube una imagen representativa de tu receta (opcional)
+            </small>
+            <div
+              id="imagen-preview"
+              class="image-preview"
+              style="display: none"
+            >
+              <img id="preview-img" src="" alt="Vista previa de la imagen" />
+              <button
+                type="button"
+                id="eliminar-imagen"
+                class="btn-eliminar-imagen"
+              >
+                × Eliminar imagen
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="receta-nombre" class="form-label">
+                <span class="label-icon">🍽️</span> Nombre de la receta *
+              </label>
+              <input
+                type="text"
+                id="receta-nombre"
+                class="form-input"
+                placeholder="Ej: Smoothie energético de espinacas"
+                required
+                aria-required="true"
+              />
+            </div>
+            <div class="form-group">
+              <label for="receta-categoria" class="form-label">
+                <span class="label-icon">🏷️</span> Categoría *
+              </label>
+              <select
+                id="receta-categoria"
+                class="form-select"
+                required
+                aria-required="true"
+              >
+                <option value="">Seleccionar categoría</option>
+                <option value="Desayuno">🌅 Desayuno</option>
+                <option value="Almuerzo">🍽️ Almuerzo</option>
+                <option value="Cena">🌙 Cena</option>
+                <option value="Snack">🍪 Snack</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="receta-desc" class="form-label">
+              <span class="label-icon">📄</span> Descripción *
+            </label>
+            <textarea
+              id="receta-desc"
+              class="form-textarea"
+              rows="3"
+              placeholder="Describe tu receta de manera atractiva..."
+              required
+              aria-required="true"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="receta-tiempo" class="form-label">
+                <span class="label-icon">⏱️</span> Tiempo (min) *
+              </label>
+              <input
+                type="number"
+                id="receta-tiempo"
+                class="form-input"
+                min="1"
+                max="300"
+                required
+                aria-required="true"
+              />
+            </div>
+            <div class="form-group">
+              <label for="receta-dificultad" class="form-label">
+                <span class="label-icon">📊</span> Dificultad *
+              </label>
+              <select
+                id="receta-dificultad"
+                class="form-select"
+                required
+                aria-required="true"
+              >
+                <option value="">Seleccionar dificultad</option>
+                <option value="Fácil">⭐ Fácil</option>
+                <option value="Media">⭐⭐ Media</option>
+                <option value="Difícil">⭐⭐⭐ Difícil</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información nutricional mejorada -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">🔥</span> Información Nutricional
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="receta-calorias" class="form-label">
+                <span class="label-icon">⚡</span> Calorías totales *
+              </label>
+              <input
+                type="number"
+                id="receta-calorias"
+                class="form-input"
+                min="1"
+                max="2000"
+                required
+                aria-required="true"
+              />
+            </div>
+            <div class="form-group">
+              <label for="receta-objetivo" class="form-label">
+                <span class="label-icon">🎯</span> Objetivo
+              </label>
+              <select id="receta-objetivo" class="form-select">
+                <option value="Energía">⚡ Energía</option>
+                <option value="Proteína">💪 Proteína</option>
+                <option value="Bajo en calorías">🍃 Bajo en calorías</option>
+                <option value="Saludable">❤️ Saludable</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="macronutrientes-container">
+            <label class="macros-label">
+              <span class="label-icon">📊</span> Macronutrientes (gramos) *
+            </label>
+            <div class="macronutrientes-grid">
+              <div class="macro-item">
+                <label for="receta-proteinas" class="macro-label">
+                  <span class="macro-icon">🥩</span> Proteínas
+                </label>
+                <input
+                  type="number"
+                  id="receta-proteinas"
+                  class="macro-input"
+                  min="0"
+                  step="0.1"
+                  required
+                  aria-required="true"
+                />
+              </div>
+              <div class="macro-item">
+                <label for="receta-carbs" class="macro-label">
+                  <span class="macro-icon">🍞</span> Carbohidratos
+                </label>
+                <input
+                  type="number"
+                  id="receta-carbs"
+                  class="macro-input"
+                  min="0"
+                  step="0.1"
+                  required
+                  aria-required="true"
+                />
+              </div>
+              <div class="macro-item">
+                <label for="receta-grasas" class="macro-label">
+                  <span class="macro-icon">🥑</span> Grasas
+                </label>
+                <input
+                  type="number"
+                  id="receta-grasas"
+                  class="macro-input"
+                  min="0"
+                  step="0.1"
+                  required
+                  aria-required="true"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ingredientes mejorados -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">🥕</span> Ingredientes
+          </h3>
+          <div
+            id="ingredientes-container"
+            class="dynamic-container"
+            aria-live="polite"
+          >
+            <!-- Los ingredientes se añadirán dinámicamente -->
+          </div>
+          <button
+            type="button"
+            id="agregar-ingrediente"
+            class="btn-add-item"
+            aria-label="Añadir nuevo ingrediente"
+          >
+            <span class="btn-icon">+</span>
+            <span class="btn-text">Añadir Ingrediente</span>
+          </button>
+        </div>
+
+        <!-- Pasos de preparación mejorados -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">👨‍🍳</span> Pasos de Preparación
+          </h3>
+          <div
+            id="pasos-container"
+            class="dynamic-container"
+            aria-live="polite"
+          >
+            <!-- Los pasos se añadirán dinámicamente -->
+          </div>
+          <button
+            type="button"
+            id="agregar-paso"
+            class="btn-add-item"
+            aria-label="Añadir nuevo paso"
+          >
+            <span class="btn-icon">+</span>
+            <span class="btn-text">Añadir Paso</span>
+          </button>
+        </div>
+
+        <!-- Palabras clave mejoradas -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">🏷️</span> Etiquetas
+          </h3>
+          <div class="form-group">
+            <label for="receta-keywords" class="form-label">
+              <span class="label-icon">🔖</span> Palabras clave (separadas por
+              comas)
+            </label>
+            <input
+              type="text"
+              id="receta-keywords"
+              class="form-input"
+              placeholder="Ej: saludable, rápido, vegano, energético"
+              aria-describedby="keywords-help"
+            />
+            <small id="keywords-help" class="form-help">
+              Ayuda a otros usuarios a encontrar tu receta
+            </small>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            onclick="closeModal()"
+            aria-label="Cancelar y cerrar formulario"
+          >
+            <span class="btn-icon">✖</span>
+            <span class="btn-text">Cancelar</span>
+          </button>
+          <button type="submit" class="btn-save" aria-label="Guardar receta">
+            <span class="btn-icon">💾</span>
+            <span class="btn-text">Guardar Receta</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para ver detalles de receta mejorado -->
+<div
+  class="modal-overlay"
+  id="modal-detalles"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="detalle-titulo"
+  style="display: none"
+>
+  <div class="modal-container modal-details">
+    <div class="modal-header">
+      <h2 id="detalle-titulo" class="modal-title">Detalles de la Receta</h2>
+      <button
+        class="modal-close"
+        onclick="closeDetallesModal()"
+        type="button"
+        aria-label="Cerrar detalles"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body" id="detalle-contenido" aria-live="polite">
+      <!-- El contenido se cargará dinámicamente -->
+    </div>
+  </div>
+</div>

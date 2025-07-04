@@ -1,0 +1,427 @@
+/* =============================================
+   VARIABLES CSS - Diseño consistente
+   ============================================= */
+:root {
+  /* Colores principales */
+  --color-primary: #66bb6a;
+  --color-primary-dark: #4caf50;
+  --color-primary-light: #81c784;
+  --color-danger: #ef4444;
+  --color-danger-dark: #ba4235;
+
+  /* Escala de grises */
+  --color-dark: #1a202c;
+  --color-dark-light: #2d3748;
+  --color-text: #f0f8ff;
+  --color-text-secondary: #cbd5e0;
+  --color-text-muted: #a0aec0;
+
+  /* Sombras */
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 5px 20px rgba(0, 0, 0, 0.2);
+  --shadow-header: 0 2px 15px rgba(0, 0, 0, 0.3);
+
+  /* Bordes */
+  --border-radius: 6px;
+  --border-radius-lg: 12px;
+
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+/* =============================================
+     ESTILOS BASE
+     ============================================= */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: "Montserrat", sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-dark);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* =============================================
+     ESTRUCTURA PRINCIPAL
+     ============================================= */
+.app-header {
+  background-color: var(--color-dark-light);
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-header);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  gap: 20px;
+}
+
+.app-main-content {
+  flex-grow: 1;
+  width: 100%;
+  padding: 40px;
+  max-width: 1700px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-dark-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  min-height: 400px;
+  box-sizing: border-box;
+}
+
+.app-footer {
+  background-color: var(--color-dark);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 20px;
+  margin-top: auto;
+  font-size: 0.9em;
+  border-top: 1px solid var(--color-dark-light);
+}
+
+/* =============================================
+     COMPONENTES REUTILIZABLES
+     ============================================= */
+/* Logo y marca */
+.app-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.app-logo-img {
+  height: 50px;
+  width: auto;
+  margin-right: 10px;
+}
+
+.app-logo-text {
+  font-size: 1.8em;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
+  color: var(--color-primary);
+}
+
+/* Navegación */
+.nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 50px;
+}
+
+.nav-links a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1em;
+  padding: 5px 0;
+  transition: color var(--transition-normal),
+    border-bottom var(--transition-normal);
+  border-bottom: 2px solid transparent;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--color-primary-light);
+  border-bottom-color: var(--color-primary);
+}
+
+/* Información de usuario */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-shrink: 0;
+}
+
+#user-display-name {
+  font-weight: 600;
+  font-size: 1em;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Botones */
+.btn-logout {
+  background-color: var(--color-danger);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-normal),
+    transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-logout:hover {
+  background-color: var(--color-danger-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Contenido de páginas */
+.page-content {
+  width: 100%;
+}
+
+.page-content h2 {
+  font-size: 2.2em;
+  color: var(--color-primary);
+  margin-bottom: 15px;
+}
+
+.page-content p {
+  font-size: 1.1em;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  max-width: 600px;
+  margin: 0 auto 15px auto;
+}
+
+/* ===== Estilos para el menú de usuario ===== */
+.user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color var(--transition-fast);
+}
+
+.user-menu-toggle svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--color-text-secondary);
+}
+
+.user-menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: var(--color-dark-light);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 10px 0;
+  min-width: 160px;
+  z-index: 1001;
+  display: none;
+}
+
+.user-menu-dropdown a,
+.user-menu-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.user-menu-dropdown a:hover,
+.user-menu-dropdown button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-primary-light);
+}
+
+.user-menu:hover .user-menu-dropdown {
+  display: block;
+}
+
+.username {
+  font-weight: 700;
+  color: var(--color-primary-light);
+}
+
+/* Estilos para el avatar en el header */
+.user-avatar-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 10px;
+  border: 2px solid var(--color-primary);
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Ajuste para el menú desplegable */
+.user-menu {
+  margin-left: 10px;
+}
+
+/* =============================================
+     MEDIA QUERIES - Responsividad
+     ============================================= */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .app-brand {
+    margin-bottom: 0;
+  }
+
+  .app-logo-img {
+    height: 40px;
+  }
+
+  .app-logo-text {
+    font-size: 1.6em;
+  }
+
+  .nav-links {
+    gap: 10px;
+  }
+
+  .user-info {
+    flex-direction: column;
+    margin-left: 0;
+    width: 100%;
+    gap: 10px;
+  }
+
+  #user-display-name {
+    max-width: none;
+  }
+
+  .btn-logout {
+    width: 100%;
+  }
+
+  .app-main-content {
+    padding: 25px;
+    margin: 15px auto;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 15px;
+  }
+
+  .app-logo-img {
+    height: 35px;
+    margin-right: 8px;
+  }
+
+  .app-logo-text {
+    font-size: 1.4em;
+  }
+
+  .nav-links a {
+    font-size: 0.9em;
+  }
+
+  .app-main-content {
+    padding: 20px;
+    margin: 10px auto;
+    min-height: 250px;
+  }
+
+  .page-content h2 {
+    font-size: 1.6em;
+  }
+
+  .page-content p {
+    font-size: 0.9em;
+  }
+}
+
+/* Pantallas horizontales con altura limitada */
+@media screen and (orientation: landscape) and (max-height: 550px),
+  screen and (max-height: 550px) and (min-width: 769px) {
+  .app-header {
+    padding: 10px 20px;
+    flex-direction: row;
+  }
+
+  .app-logo-img {
+    height: 30px;
+  }
+
+  .app-logo-text {
+    font-size: 1.5em;
+  }
+
+  .nav-links {
+    justify-content: flex-start;
+  }
+
+  .user-info {
+    flex-direction: row;
+    margin-left: 15px;
+    width: auto;
+    gap: 8px;
+  }
+
+  #user-display-name {
+    max-width: 80px;
+    font-size: 0.85em;
+  }
+
+  .btn-logout {
+    width: auto;
+    padding: 6px 10px;
+    font-size: 0.75em;
+  }
+
+  .app-main-content {
+    padding: 20px;
+    margin: 10px auto;
+    min-height: 180px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+}
