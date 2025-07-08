@@ -2,12 +2,13 @@
   <aside class="seleccion-sidebar">
     <div class="sidebar-header">
       <h3><span class="icon-filter">➕</span> Agregar a Mi Plan</h3>
-      <p class="sidebar-subtitle">Arrastra items a tu plan semanal</p>
+      <p class="sidebar-subtitle">Arrastra elementos a tu plan semanal</p>
     </div>
 
     <div class="seleccion-container">
       <div class="tabs">
         <button class="tab-btn active" data-tab="recetas">🍽️ Recetas</button>
+        <!-- Asegurado texto correcto -->
         <button class="tab-btn" data-tab="entrenamientos">
           💪 Entrenamientos
         </button>
@@ -92,5 +93,11 @@
       </div>
       <div class="modal-body" id="detalle-contenido"></div>
     </div>
+  </div>
+
+  <!-- Añade un indicador de carga -->
+  <div id="loading-indicator" class="loading-indicator" style="display: none">
+    <div class="spinner"></div>
+    <p>Cargando tu plan...</p>
   </div>
 </div>

@@ -13,8 +13,11 @@ import {
   setCurrentPlan,
 } from "./mi-plan.crud.js";
 import {
-  getCurrentWeekRange,
+  getWeekRange,
   calculateNutritionTotals,
+  showError,
+  showSuccess,
+  makeDraggable,
 } from "./mi-plan.utils.js";
 import {
   renderWeekGrid,
@@ -23,84 +26,130 @@ import {
 } from "./mi-plan.render.js";
 
 // Estado global
-let currentWeek = getCurrentWeekRange();
-let currentUserId = "user123"; // Esto debería venir de tu sistema de autenticación
+let currentWeek = getWeekRange();
+let currentUserId = null;
 
 // Inicialización
 async function init() {
   try {
-    const firestoreInitialized = await initFirestore();
-    if (!firestoreInitialized) {
-      console.error(
-        "No se pudo inicializar Firebase. La aplicación no funcionará correctamente."
-      );
-      // Aquí podrías mostrar un mensaje al usuario o fallback
+    // Obtener usuario autenticado (debes implementar esta función según tu auth system)
+    const user = await getCurrentUser();
+    if (!user) {
+      window.location.href = "/index.html"; // Redirige si no hay usuario
       return;
     }
+    currentUserId = user.uid;
+
+    const firestoreInitialized = await initFirestore();
+    if (!firestoreInitialized) {
+      showError("No se pudo conectar con la base de datos");
+      return;
+    }
+
     await loadInitialData();
     setupEventListeners();
   } catch (error) {
     console.error("Error inicializando Mi Plan:", error);
+    showError("Ocurrió un error al iniciar la aplicación.");
   }
 }
 
-async function loadInitialData() {
-  const plan = await loadUserPlan(currentUserId);
-  setCurrentPlan(plan); // Asegura que el plan global en crud.js esté actualizado
-  renderWeekGrid(plan, currentWeek);
-  updateNutritionTotals(plan);
-
-  // Cargar recetas y entrenamientos para el sidebar
-  const recetas = await loadRecetas();
-  const entrenamientos = await loadEntrenamientos();
-
-  renderRecetasList(recetas);
-  renderEntrenamientosList(entrenamientos);
+// Función placeholder para obtener el usuario actual
+// DEBES IMPLEMENTAR ESTA FUNCIÓN SEGÚN TU SISTEMA DE AUTENTICACIÓN (ej. Firebase Auth)
+async function getCurrentUser() {
+  // Ejemplo: Podrías usar Firebase Authentication aquí
+  // const auth = getAuth();
+  // return new Promise((resolve) => {
+  //   onAuthStateChanged(auth, (user) => {
+  //     resolve(user);
+  //   });
+  // });
+  // Por ahora, un usuario de prueba o una implementación dummy:
+  return { uid: "testUser123" }; // <--- Asegúrate de que esto devuelve un objeto con 'uid'
 }
 
-// --- Nuevas funciones para cargar recetas y entrenamientos ---
+async function loadInitialData() {
+  try {
+    showLoading();
+    const plan = await loadUserPlan(currentUserId, currentWeek.id);
+    setCurrentPlan(plan);
+    renderWeekGrid(plan, currentWeek);
+    updateNutritionTotals(plan);
+
+    // Cargar recetas y entrenamientos para el sidebar
+    const recetas = await loadRecetas();
+    const entrenamientos = await loadEntrenamientos();
+
+    renderRecetasList(recetas);
+    renderEntrenamientosList(entrenamientos);
+    hideLoading();
+  } catch (error) {
+    console.error("Error cargando datos iniciales:", error);
+    showError("No se pudieron cargar los datos iniciales.");
+    hideLoading();
+  }
+}
+
 async function loadRecetas() {
   try {
-    const recetas = await getRecetasCollection();
-    // Aquí podrías agregar lógica de filtrado o procesamiento si es necesario
-    return recetas;
+    const recetasCollection = await getRecetasCollection();
+    // Filtrar y devolver solo las recetas válidas
+    return recetasCollection.filter((receta) => receta.id && receta.nombre);
   } catch (error) {
     console.error("Error cargando recetas:", error);
+    showError("Error al cargar recetas.");
     return [];
   }
 }
 
 async function loadEntrenamientos() {
   try {
-    const entrenamientos = await getEntrenamientosCollection();
-    // Aquí podrías agregar lógica de filtrado o procesamiento si es necesario
-    return entrenamientos;
+    const entrenamientosCollection = await getEntrenamientosCollection();
+    // Filtrar y devolver solo los entrenamientos válidos
+    return entrenamientosCollection.filter(
+      (entrenamiento) => entrenamiento.id && entrenamiento.nombre
+    );
   } catch (error) {
     console.error("Error cargando entrenamientos:", error);
+    showError("Error al cargar entrenamientos.");
     return [];
   }
 }
-// -----------------------------------------------------------
 
 function setupEventListeners() {
   // Navegación semanal
-  elements.prevWeek.addEventListener("click", () => {
-    // Lógica para ir a la semana anterior
-    console.log("Navegar a semana anterior");
-    // Esto es un placeholder. Necesitarías una lógica para calcular la semana anterior
-    // y luego volver a cargar los datos y renderizar.
-    // currentWeek = calculatePreviousWeek(currentWeek);
-    // loadInitialData();
+  elements.prevWeek.addEventListener("click", async () => {
+    const prevMonday = new Date(currentWeek.start);
+    prevMonday.setDate(prevMonday.getDate() - 7);
+    currentWeek = getWeekRange(prevMonday);
+    await loadInitialData();
   });
 
-  elements.nextWeek.addEventListener("click", () => {
-    // Lógica para ir a la semana siguiente
-    console.log("Navegar a semana siguiente");
-    // currentWeek = calculateNextWeek(currentWeek);
-    // loadInitialData();
+  elements.nextWeek.addEventListener("click", async () => {
+    const nextMonday = new Date(currentWeek.start);
+    nextMonday.setDate(nextMonday.getDate() + 7);
+    currentWeek = getWeekRange(nextMonday);
+    await loadInitialData();
   });
 
-  // Funcionalidad de Drag and Drop
+  // Event listeners para pestañas del sidebar
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const tab = e.target.dataset.tab;
+
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+      document.querySelectorAll(".tab-content").forEach((content) => {
+        content.classList.remove("active");
+      });
+
+      e.target.classList.add("active");
+      document.getElementById(`${tab}-tab`).classList.add("active");
+    });
+  });
+
+  // Event listeners para drag & drop en el plan semanal
   elements.semanaGrid.addEventListener("dragover", (e) => {
     e.preventDefault(); // Permite el drop
     const slot = e.target.closest(".slot");
@@ -126,42 +175,77 @@ function setupEventListeners() {
     try {
       const data = JSON.parse(e.dataTransfer.getData("text/plain"));
       const dayId = slot.dataset.dia;
-      const slotType = slot.dataset.tipo; // "desayuno", "almuerzo", etc., o "entrenamiento"
+      const slotType = slot.dataset.tipo;
 
-      // Obtener el plan actualizado después de asignar el elemento
-      const updatedPlan = await assignItemToDay(dayId, slotType, data);
+      if (slotType === "entrenamiento" && data.type !== "entrenamiento") {
+        showError(
+          "Solo puedes arrastrar entrenamientos a los slots de entrenamiento."
+        );
+        return;
+      }
+      if (slotType !== "entrenamiento" && data.type === "entrenamiento") {
+        showError("No puedes arrastrar entrenamientos a los slots de comida.");
+        return;
+      }
 
-      // Volver a renderizar la semana completa con el plan actualizado
-      renderWeekGrid(updatedPlan, currentWeek);
-      updateNutritionTotals(updatedPlan);
+      await assignItemToDay(dayId, slotType, data);
+      await loadInitialData(); // Recargar datos para reflejar cambios y actualizar totales
+      showSuccess("Elemento asignado correctamente.");
     } catch (error) {
       console.error("Error en drop:", error);
+      showError("Error al asignar elemento al plan.");
     }
   });
 
-  // Event listener para eliminar elementos del plan (delegación)
+  // Remover elemento del día
   elements.semanaGrid.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("btn-remove")) {
-      const slotContent = e.target.closest(".slot-content");
-      if (!slotContent) return;
+    const removeBtn = e.target.closest(".btn-remove");
+    if (removeBtn) {
+      const itemElement = removeBtn.closest(
+        ".comida-item, .entrenamiento-item"
+      );
+      const slotElement = removeBtn.closest(".slot");
 
-      const itemId = slotContent.dataset.id;
-      const slot = e.target.closest(".slot");
-      const dayId = slot.dataset.dia;
-      const slotType = slot.dataset.tipo;
+      if (!itemElement || !slotElement) return;
 
-      if (
-        confirm("¿Estás seguro de que quieres eliminar este elemento del plan?")
-      ) {
+      const dayId = slotElement.dataset.dia;
+      const slotType = slotElement.dataset.tipo;
+      const itemId = itemElement.dataset.id; // Asume que la receta/entrenamiento tiene un ID
+
+      if (confirm("¿Estás seguro de que quieres eliminar este elemento?")) {
         try {
-          const updatedPlan = await removeItemFromDay(dayId, slotType, itemId);
-          renderWeekGrid(updatedPlan, currentWeek);
-          updateNutritionTotals(updatedPlan);
+          await removeItemFromDay(dayId, slotType, itemId);
+          await loadInitialData();
+          showSuccess("Elemento eliminado del plan.");
         } catch (error) {
-          console.error("Error al intentar eliminar elemento:", error);
+          console.error("Error eliminando elemento:", error);
+          showError("Error al eliminar el elemento.");
         }
       }
     }
+  });
+
+  // Búsqueda de recetas y entrenamientos
+  elements.buscarRecetas.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const allRecetas = getCurrentPlan().allRecetas || []; // Asume que tienes todas las recetas cargadas
+    const filteredRecetas = allRecetas.filter(
+      (receta) =>
+        receta.nombre.toLowerCase().includes(searchTerm) ||
+        receta.tags?.some((tag) => tag.toLowerCase().includes(searchTerm))
+    );
+    renderRecetasList(filteredRecetas);
+  });
+
+  elements.buscarEntrenamientos.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const allEntrenamientos = getCurrentPlan().allEntrenamientos || []; // Asume que tienes todos los entrenamientos cargados
+    const filteredEntrenamientos = allEntrenamientos.filter(
+      (ent) =>
+        ent.nombre.toLowerCase().includes(searchTerm) ||
+        ent.keywords?.some((kw) => kw.toLowerCase().includes(searchTerm))
+    );
+    renderEntrenamientosList(filteredEntrenamientos);
   });
 
   // Modal de estadísticas
@@ -174,42 +258,30 @@ function setupEventListeners() {
     elements.modalEstadisticas.style.display = "none";
   });
 
-  // Manejo de pestañas en el sidebar
-  document.querySelectorAll(".tab-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      const tabName = button.dataset.tab;
+  // Modal de detalles
+  elements.semanaGrid.addEventListener("click", (e) => {
+    const detailBtn = e.target.closest(".btn-detail");
+    if (detailBtn) {
+      const type = detailBtn.dataset.type;
+      const id = detailBtn.dataset.id;
+      const plan = getCurrentPlan();
+      let item = null;
 
-      // Desactivar todas las pestañas y contenidos
-      document
-        .querySelectorAll(".tab-btn")
-        .forEach((btn) => btn.classList.remove("active"));
-      document
-        .querySelectorAll(".tab-content")
-        .forEach((content) => content.classList.remove("active"));
+      if (type === "receta") {
+        item = plan.allRecetas?.find((r) => r.id === id);
+      } else if (type === "entrenamiento") {
+        item = plan.allEntrenamientos?.find((e) => e.id === id);
+      }
 
-      // Activar la pestaña y el contenido correctos
-      button.classList.add("active");
-      document.getElementById(`${tabName}-tab`).classList.add("active");
-    });
+      if (item) {
+        renderDetalleModal(item, type);
+        elements.modalDetalles.style.display = "block";
+      }
+    }
   });
 
-  // Funcionalidad de búsqueda (simple, se puede mejorar)
-  elements.buscarRecetas.addEventListener("input", async (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const allRecetas = await loadRecetas();
-    const filteredRecetas = allRecetas.filter((receta) =>
-      receta.nombre.toLowerCase().includes(searchTerm)
-    );
-    renderRecetasList(filteredRecetas);
-  });
-
-  elements.buscarEntrenamientos.addEventListener("input", async (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const allEntrenamientos = await loadEntrenamientos();
-    const filteredEntrenamientos = allEntrenamientos.filter((ent) =>
-      ent.nombre.toLowerCase().includes(searchTerm)
-    );
-    renderEntrenamientosList(filteredEntrenamientos);
+  elements.closeDetalles.addEventListener("click", () => {
+    elements.modalDetalles.style.display = "none";
   });
 }
 
@@ -222,17 +294,76 @@ function updateNutritionTotals(plan) {
 }
 
 function renderStats() {
-  // Implementar renderizado de gráficas/estadísticas detalladas
+  const plan = getCurrentPlan();
+  const totals = calculateNutritionTotals(plan);
+
   elements.statsGrid.innerHTML = `
-    <p>Estadísticas aquí (aún no implementado).</p>
-    <p>Calorías semanales: ${
-      calculateNutritionTotals(getCurrentPlan()).calorias
-    }</p>
-    <p>Proteínas semanales: ${
-      calculateNutritionTotals(getCurrentPlan()).proteinas
-    }g</p>
+    <div class="stat-card">
+      <h3>Resumen Nutricional</h3>
+      <p>Calorías totales: ${totals.calorias}</p>
+      <p>Proteínas: ${totals.proteinas}g</p>
+      <p>Carbohidratos: ${totals.carbohidratos}g</p>
+      <p>Grasas: ${totals.grasas}g</p>
+    </div>
+    <div class="stat-card">
+      <h3>Actividad Física</h3>
+      <p>Calorías quemadas: ${totals.caloriasQuemadas || 0}</p>
+    </div>
   `;
 }
 
-// Iniciar la aplicación
-init();
+function renderDetalleModal(item, type) {
+  elements.detalleTitulo.textContent = item.nombre;
+  let content = ``;
+
+  if (type === "receta") {
+    content = `
+      <img src="${item.imagenUrl || "placeholder.jpg"}" alt="${
+      item.nombre
+    }" style="width: 100%; max-height: 200px; object-fit: cover; margin-bottom: 15px;">
+      <p><strong>Calorías:</strong> ${item.calorias || "N/A"}</p>
+      <p><strong>Tiempo de preparación:</strong> ${
+        item.tiempoPreparacion || "N/A"
+      } min</p>
+      <p><strong>Macronutrientes:</strong></p>
+      <ul>
+        <li>Proteínas: ${item.macronutrientes?.proteinas || 0}g</li>
+        <li>Carbohidratos: ${item.macronutrientes?.carbohidratos || 0}g</li>
+        <li>Grasas: ${item.macronutrientes?.grasas || 0}g</li>
+      </ul>
+      <p><strong>Ingredientes:</strong> ${
+        item.ingredientes?.join(", ") || "No especificados"
+      }</p>
+      <p><strong>Instrucciones:</strong> ${
+        item.instrucciones || "No especificadas"
+      }</p>
+      <p><strong>Tags:</strong> ${item.tags?.join(", ") || "Ninguno"}</p>
+    `;
+  } else if (type === "entrenamiento") {
+    content = `
+      <p><strong>Duración:</strong> ${item.duracion || "N/A"} min</p>
+      <p><strong>Calorías quemadas estimadas:</strong> ${item.calorias || 0}</p>
+      <p><strong>Tipo:</strong> ${item.tipo || "N/A"}</p>
+      <p><strong>Descripción:</strong> ${
+        item.descripcion || "No especificada"
+      }</p>
+      <p><strong>Keywords:</strong> ${
+        item.keywords?.join(", ") || "Ninguno"
+      }</p>
+    `;
+  }
+  elements.detalleContenido.innerHTML = content;
+}
+
+function showLoading() {
+  document.body.appendChild(elements.loadingIndicator);
+}
+
+function hideLoading() {
+  if (document.body.contains(elements.loadingIndicator)) {
+    document.body.removeChild(elements.loadingIndicator);
+  }
+}
+
+// Inicializar la aplicación cuando el DOM esté completamente cargado
+document.addEventListener("DOMContentLoaded", init);

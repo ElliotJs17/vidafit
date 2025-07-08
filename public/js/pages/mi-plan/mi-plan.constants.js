@@ -1,4 +1,4 @@
-// Días de la semana y tipos de comidas
+// Días de la semana
 export const DIAS_SEMANA = [
   { id: "lunes", nombre: "Lunes" },
   { id: "martes", nombre: "Martes" },
@@ -9,6 +9,7 @@ export const DIAS_SEMANA = [
   { id: "domingo", nombre: "Domingo" },
 ];
 
+// Tipos de comidas
 export const TIPOS_COMIDA = [
   { id: "desayuno", nombre: "Desayuno" },
   { id: "almuerzo", nombre: "Almuerzo" },
@@ -16,6 +17,7 @@ export const TIPOS_COMIDA = [
   { id: "snack", nombre: "Snack" },
 ];
 
+// Tipos de entrenamiento
 export const TIPOS_ENTRENAMIENTO = [
   { id: "cardio", nombre: "Cardio" },
   { id: "fuerza", nombre: "Fuerza" },
@@ -23,7 +25,24 @@ export const TIPOS_ENTRENAMIENTO = [
   { id: "yoga", nombre: "Yoga" },
 ];
 
-// Configuración de Firebase
+// Configuración de Firestore
 export const FIRESTORE_CONFIG = {
   collectionName: "mi-plan",
+};
+
+// Objetivos de fitness
+export const FITNESS_GOALS = {
+  "weight-loss": "Pérdida de peso",
+  "muscle-gain": "Ganancia muscular",
+  "improve-endurance": "Mejorar resistencia",
+  "improve-flexibility": "Mejorar flexibilidad",
+};
+
+// Niveles de actividad
+export const ACTIVITY_LEVELS = {
+  sedentary: "Sedentario",
+  light: "Ligero",
+  moderate: "Moderado",
+  active: "Activo",
+  veryActive: "Muy activo",
 };

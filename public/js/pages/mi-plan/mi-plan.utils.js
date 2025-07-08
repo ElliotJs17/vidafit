@@ -9,9 +9,9 @@ export function formatDate(date) {
   });
 }
 
-export function getCurrentWeekRange() {
-  const now = new Date();
-  const dayOfWeek = now.getDay() || 7; // Ajuste para que lunes sea 1
+export function getWeekRange(date = new Date()) {
+  const now = new Date(date);
+  const dayOfWeek = now.getDay() || 7;
   const monday = new Date(now);
   monday.setDate(now.getDate() - dayOfWeek + 1);
 
@@ -22,6 +22,7 @@ export function getCurrentWeekRange() {
     start: monday,
     end: sunday,
     string: `Del ${formatDate(monday)} al ${formatDate(sunday)}`,
+    id: monday.toISOString().split("T")[0],
   };
 }
 
@@ -31,9 +32,10 @@ export function calculateNutritionTotals(plan) {
     proteinas: 0,
     carbohidratos: 0,
     grasas: 0,
+    caloriasQuemadas: 0,
   };
 
-  if (!plan || !plan.dias) return totals;
+  if (!plan?.dias) return totals;
 
   plan.dias.forEach((dia) => {
     dia.comidas.forEach((comida) => {
@@ -45,36 +47,48 @@ export function calculateNutritionTotals(plan) {
         totals.grasas += comida.receta.macronutrientes?.grasas || 0;
       }
     });
+
+    dia.entrenamientos.forEach((ent) => {
+      totals.caloriasQuemadas += ent.calorias || 0;
+    });
   });
+
   return totals;
 }
 
-/**
- * Muestra un mensaje de error al usuario.
- * @param {string} message El mensaje de error a mostrar.
- */
 export function showError(message) {
-  console.error("Error:", message);
-  alert(`Error: ${message}`);
+  const toast = document.createElement("div");
+  toast.className = "toast error";
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("fade-out");
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
 }
 
-/**
- * Muestra un mensaje de éxito al usuario.
- * @param {string} message El mensaje de éxito a mostrar.
- */
 export function showSuccess(message) {
-  console.log("Éxito:", message);
+  const toast = document.createElement("div");
+  toast.className = "toast success";
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("fade-out");
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
 }
 
-/**
- * Hace que un elemento sea arrastrable y almacena datos en el evento de arrastre.
- * @param {HTMLElement} element El elemento DOM que se hará arrastrable.
- * @param {Object} data Los datos que se adjuntarán al evento de arrastre (ej. { id: 'receta1', type: 'receta' }).
- */
 export function makeDraggable(element, data) {
   element.setAttribute("draggable", "true");
   element.addEventListener("dragstart", (e) => {
-    e.dataTransfer.setData("text/plain", JSON.stringify(data));
-    e.dataTransfer.effectAllowed = "move"; // O "copy"
+    e.dataTransfer.setData("application/json", JSON.stringify(data));
+    e.dataTransfer.effectAllowed = "move";
+    element.classList.add("dragging");
+  });
+
+  element.addEventListener("dragend", () => {
+    element.classList.remove("dragging");
   });
 }

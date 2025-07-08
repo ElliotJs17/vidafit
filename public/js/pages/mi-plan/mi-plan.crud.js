@@ -1,37 +1,39 @@
 import {
   getMiPlanCollection,
-  getPlanByUserId,
+  getPlanByWeekId,
   savePlan,
 } from "./mi-plan.firebase.js";
 import { showError, showSuccess } from "./mi-plan.utils.js";
-import { renderWeekGrid } from "./mi-plan.render.js";
+import { DIAS_SEMANA, TIPOS_COMIDA } from "./mi-plan.constants.js"; // Importar DIAS_SEMANA y TIPOS_COMIDA
 
 let currentPlan = null;
-let currentUserId = null;
+// let currentUserId = null; // Esta variable global no es necesaria aquí
 
-// Función auxiliar para generar un ID de plan (si no tienes uno de Firebase Auth, por ejemplo)
-function generatePlanId(userId) {
-  return `${userId}-${Date.now()}`;
-}
-
-export async function loadUserPlan(userId) {
+export async function loadUserPlan(userId, weekId) {
   try {
-    currentUserId = userId;
-    const plan = await getPlanByUserId(userId);
+    const planId = `${userId}-${weekId}`;
+    const plan = await getPlanByWeekId(planId);
 
     if (plan) {
       currentPlan = plan;
     } else {
-      // Crear un plan nuevo si no existe
       currentPlan = {
-        id: generatePlanId(userId),
+        id: planId,
         userId: userId,
-        nombre: `Plan de ${new Date().toLocaleDateString()}`,
-        dias: [],
+        weekId: weekId,
+        nombre: `Plan Semanal ${new Date(weekId).toLocaleDateString()}`,
+        dias: DIAS_SEMANA.map((dia) => ({
+          fecha: dia.id,
+          comidas: TIPOS_COMIDA.map((tipo) => ({
+            tipo: tipo.id,
+            receta: null,
+          })),
+          entrenamientos: [],
+        })),
         createdAt: new Date().toISOString(),
       };
       await savePlan(currentPlan);
-      showSuccess("¡Plan nuevo creado con éxito!");
+      showSuccess("¡Nuevo plan creado!");
     }
 
     return currentPlan;
@@ -42,6 +44,14 @@ export async function loadUserPlan(userId) {
   }
 }
 
+export function getCurrentPlan() {
+  return currentPlan;
+}
+
+export function setCurrentPlan(plan) {
+  currentPlan = plan;
+}
+
 export async function assignItemToDay(dayId, slotType, item) {
   try {
     const dayIndex = currentPlan.dias.findIndex((d) => d.fecha === dayId);
@@ -50,7 +60,7 @@ export async function assignItemToDay(dayId, slotType, item) {
     if (dayIndex === -1) {
       dayPlan = {
         fecha: dayId,
-        comidas: [],
+        comidas: TIPOS_COMIDA.map((tipo) => ({ tipo: tipo.id, receta: null })), // Asegura que se inicializan todos los tipos de comida
         entrenamientos: [],
       };
       currentPlan.dias.push(dayPlan);
@@ -59,10 +69,12 @@ export async function assignItemToDay(dayId, slotType, item) {
     }
 
     if (slotType === "entrenamiento") {
-      dayPlan.entrenamientos = [item]; // Simplificado: solo permite un entrenamiento por slot
+      // Si ya hay un entrenamiento, lo reemplaza. Podrías querer permitir múltiples.
+      dayPlan.entrenamientos = [item];
     } else {
       const comidaIndex = dayPlan.comidas.findIndex((c) => c.tipo === slotType);
       if (comidaIndex === -1) {
+        // Esto no debería ocurrir si inicializamos comidas con todos los tipos
         dayPlan.comidas.push({
           tipo: slotType,
           receta: item,
@@ -73,11 +85,9 @@ export async function assignItemToDay(dayId, slotType, item) {
     }
 
     await savePlan(currentPlan);
-    showSuccess("Elemento asignado al plan.");
     return currentPlan;
   } catch (error) {
-    console.error("Error asignando elemento al día:", error);
-    showError("Error al asignar elemento al plan.");
+    console.error("Error asignando elemento:", error);
     throw error;
   }
 }
@@ -85,7 +95,7 @@ export async function assignItemToDay(dayId, slotType, item) {
 export async function removeItemFromDay(dayId, slotType, itemId) {
   try {
     const day = currentPlan.dias.find((d) => d.fecha === dayId);
-    if (!day) return;
+    if (!day) return currentPlan;
 
     if (slotType === "entrenamiento") {
       day.entrenamientos = day.entrenamientos.filter(
@@ -94,29 +104,14 @@ export async function removeItemFromDay(dayId, slotType, itemId) {
     } else {
       const comidaSlot = day.comidas.find((c) => c.tipo === slotType);
       if (comidaSlot && comidaSlot.receta && comidaSlot.receta.id === itemId) {
-        comidaSlot.receta = null; // Eliminar la receta del slot
+        comidaSlot.receta = null; // Quita la receta asignada
       }
     }
 
-    // Limpiar días vacíos si es necesario (opcional)
-    currentPlan.dias = currentPlan.dias.filter(
-      (d) => d.comidas.some((c) => c.receta) || d.entrenamientos.length > 0
-    );
-
     await savePlan(currentPlan);
-    showSuccess("Elemento eliminado del plan.");
     return currentPlan;
   } catch (error) {
-    console.error("Error eliminando elemento del día:", error);
-    showError("Error al eliminar elemento del plan.");
+    console.error("Error eliminando elemento:", error);
     throw error;
   }
-}
-
-export function getCurrentPlan() {
-  return currentPlan;
-}
-
-export function setCurrentPlan(plan) {
-  currentPlan = plan;
 }

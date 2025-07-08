@@ -32,6 +32,16 @@ const elements = {
   totalProteinas: document.getElementById("total-proteinas"),
   totalCarbohidratos: document.getElementById("total-carbohidratos"),
   totalGrasas: document.getElementById("total-grasas"),
+
+  // Loading
+  loadingIndicator: document.createElement("div"),
 };
+
+// Configuración del elemento de loading
+elements.loadingIndicator.className = "loading-indicator";
+elements.loadingIndicator.innerHTML = `
+  <div class="spinner"></div>
+  <p>Cargando...</p>
+`;
 
 export default elements;

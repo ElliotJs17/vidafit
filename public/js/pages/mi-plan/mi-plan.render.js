@@ -7,16 +7,12 @@ export function renderWeekGrid(plan, weekRange) {
   elements.currentWeek.textContent = weekRange.string;
 
   DIAS_SEMANA.forEach((dia) => {
-    // Asegurarse de que el dayPlan siempre tenga una estructura para renderizar slots
     const dayPlan = plan?.dias?.find((d) => d.fecha === dia.id) || {
       fecha: dia.id,
-      // Inicializar con slots de comida vacíos para cada tipo de comida
       comidas: TIPOS_COMIDA.map((tipo) => ({ tipo: tipo.id, receta: null })),
       entrenamientos: [],
     };
 
-    // Asegurarse de que todos los TIPOS_COMIDA estén en dayPlan.comidas
-    // para que siempre se rendericen todos los slots de comida, incluso si están vacíos
     const comidasParaRender = TIPOS_COMIDA.map((tipo) => {
       return (
         dayPlan.comidas.find((c) => c.tipo === tipo.id) || {
@@ -28,7 +24,7 @@ export function renderWeekGrid(plan, weekRange) {
 
     const dayElement = document.createElement("div");
     dayElement.className = "dia-card";
-    dayElement.dataset.dia = dia.id; // Añadir data-dia al contenedor del día
+    dayElement.dataset.dia = dia.id;
     dayElement.innerHTML = `
       <h4>${dia.nombre}</h4>
       <div class="comidas-slots">
@@ -61,48 +57,44 @@ export function renderWeekGrid(plan, weekRange) {
   });
 }
 
-// Renderiza el contenido dentro de un slot de comida
 function renderComidaSlot(receta, slotType, dayId) {
-  if (receta) {
-    return `
-      <div class="slot-content receta" draggable="true" data-id="${
-        receta.id
-      }" data-type="receta" data-slot-type="${slotType}" data-day-id="${dayId}">
-        <img src="${receta.imagenUrl || "placeholder.jpg"}" alt="${
-      receta.nombre
-    }">
-        <div class="info">
-          <span class="name">${receta.nombre}</span>
-          <span class="details">${receta.calorias} cal</span>
-        </div>
-        <button class="btn-remove">×</button>
+  if (!receta) return "";
+
+  return `
+    <div class="slot-content receta" data-id="${
+      receta.id
+    }" data-type="receta" data-slot-type="${slotType}" data-day-id="${dayId}">
+      <img src="${receta.imagenUrl || "placeholder.jpg"}" alt="${
+    receta.nombre
+  }">
+      <div class="info">
+        <span class="name">${receta.nombre}</span>
+        <span class="details">${receta.calorias} cal</span>
       </div>
-    `;
-  }
-  return "";
+      <button class="btn-remove">×</button>
+    </div>
+  `;
 }
 
-// Renderiza el contenido dentro de un slot de entrenamiento
 function renderEntrenamientoSlot(entrenamiento, dayId) {
-  if (entrenamiento) {
-    return `
-      <div class="slot-content entrenamiento" draggable="true" data-id="${entrenamiento.id}" data-type="entrenamiento" data-slot-type="entrenamiento" data-day-id="${dayId}">
-        <div class="info">
-          <span class="name">${entrenamiento.nombre}</span>
-          <span class="details">⏱️ ${entrenamiento.duracion} min</span>
-        </div>
-        <button class="btn-remove">×</button>
+  if (!entrenamiento) return "";
+
+  return `
+    <div class="slot-content entrenamiento" data-id="${entrenamiento.id}" data-type="entrenamiento" data-slot-type="entrenamiento" data-day-id="${dayId}">
+      <div class="info">
+        <span class="name">${entrenamiento.nombre}</span>
+        <span class="details">⏱️ ${entrenamiento.duracion} min</span>
       </div>
-    `;
-  }
-  return "";
+      <button class="btn-remove">×</button>
+    </div>
+  `;
 }
 
 export function renderRecetasList(recetas) {
   elements.recetasList.innerHTML = recetas
     .map(
       (receta) => `
-    <div class="receta-item" data-id="${receta.id}" draggable="true">
+    <div class="receta-item" data-id="${receta.id}">
       <img src="${receta.imagenUrl || "placeholder.jpg"}" alt="${
         receta.nombre
       }">
@@ -116,22 +108,16 @@ export function renderRecetasList(recetas) {
     )
     .join("");
 
-  // Hacer elementos arrastrables
   document.querySelectorAll(".receta-item").forEach((item) => {
+    const receta = recetas.find((r) => r.id === item.dataset.id);
     makeDraggable(item, {
       type: "receta",
-      id: item.dataset.id,
-      nombre: item.querySelector("h5").textContent,
-      imagenUrl: item.querySelector("img")?.src,
-      calorias: parseInt(
-        item.querySelector(".receta-info span:nth-child(2)").textContent
-      ),
-      tiempoPreparacion: parseInt(
-        item.querySelector(".receta-info span:nth-child(3)").textContent
-      ),
-      // Añadir otros datos de la receta si son necesarios para el drag-and-drop
-      macronutrientes: {
-        // Esto es un placeholder, deberías pasarlo desde el objeto receta real
+      id: receta.id,
+      nombre: receta.nombre,
+      imagenUrl: receta.imagenUrl,
+      calorias: receta.calorias,
+      tiempoPreparacion: receta.tiempoPreparacion,
+      macronutrientes: receta.macronutrientes || {
         proteinas: 0,
         carbohidratos: 0,
         grasas: 0,
@@ -144,26 +130,26 @@ export function renderEntrenamientosList(entrenamientos) {
   elements.entrenamientosList.innerHTML = entrenamientos
     .map(
       (ent) => `
-    <div class="entrenamiento-item" data-id="${ent.id}" draggable="true">
+    <div class="entrenamiento-item" data-id="${ent.id}">
       <div class="entrenamiento-info">
         <h5>${ent.nombre}</h5>
         <span>⏱️ ${ent.duracion} min</span>
+        <span>🔥 ${ent.calorias || 0} cal</span>
       </div>
     </div>
   `
     )
     .join("");
 
-  // Hacer elementos arrastrables
   document.querySelectorAll(".entrenamiento-item").forEach((item) => {
+    const ent = entrenamientos.find((e) => e.id === item.dataset.id);
     makeDraggable(item, {
       type: "entrenamiento",
-      id: item.dataset.id,
-      nombre: item.querySelector("h5").textContent,
-      duracion: parseInt(
-        item.querySelector(".entrenamiento-info span").textContent
-      ),
-      // Añadir otros datos del entrenamiento si son necesarios
+      id: ent.id,
+      nombre: ent.nombre,
+      duracion: ent.duracion,
+      calorias: ent.calorias || 0,
+      tipo: ent.tipo || "general",
     });
   });
 }
