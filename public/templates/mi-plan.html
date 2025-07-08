@@ -1,0 +1,96 @@
+<div class="mi-plan-page">
+  <aside class="seleccion-sidebar">
+    <div class="sidebar-header">
+      <h3><span class="icon-filter">➕</span> Agregar a Mi Plan</h3>
+      <p class="sidebar-subtitle">Arrastra items a tu plan semanal</p>
+    </div>
+
+    <div class="seleccion-container">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="recetas">🍽️ Recetas</button>
+        <button class="tab-btn" data-tab="entrenamientos">
+          💪 Entrenamientos
+        </button>
+      </div>
+
+      <div id="recetas-tab" class="tab-content active">
+        <div class="search-container">
+          <input
+            type="text"
+            id="buscar-recetas"
+            placeholder="Buscar recetas..."
+          />
+        </div>
+        <div id="recetas-list" class="items-list"></div>
+      </div>
+
+      <div id="entrenamientos-tab" class="tab-content">
+        <div class="search-container">
+          <input
+            type="text"
+            id="buscar-entrenamientos"
+            placeholder="Buscar entrenamientos..."
+          />
+        </div>
+        <div id="entrenamientos-list" class="items-list"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="mi-plan-content">
+    <div class="mi-plan-header">
+      <h2>Mi Plan Semanal</h2>
+      <div class="week-navigation">
+        <button id="prev-week">← Semana Anterior</button>
+        <span id="current-week"></span>
+        <button id="next-week">Semana Siguiente →</button>
+      </div>
+      <button id="btn-estadisticas" class="btn btn-secondary">
+        Ver Estadísticas
+      </button>
+    </div>
+
+    <div class="semana-grid" id="semana-grid"></div>
+
+    <div class="resumen-nutricional">
+      <div class="resumen-item">
+        <span class="resumen-valor" id="total-calorias">0</span>
+        <span class="resumen-label">Calorías</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-valor" id="total-proteinas">0g</span>
+        <span class="resumen-label">Proteínas</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-valor" id="total-carbohidratos">0g</span>
+        <span class="resumen-label">Carbohidratos</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-valor" id="total-grasas">0g</span>
+        <span class="resumen-label">Grasas</span>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="modal-estadisticas" style="display: none">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2>📊 Estadísticas Semanales</h2>
+        <button class="modal-close" id="close-estadisticas">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="stats-grid" id="stats-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-detalles" style="display: none">
+    <div class="modal-container modal-details">
+      <div class="modal-header">
+        <h2 id="detalle-titulo">Detalles</h2>
+        <button class="modal-close" id="close-detalles">×</button>
+      </div>
+      <div class="modal-body" id="detalle-contenido"></div>
+    </div>
+  </div>
+</div>

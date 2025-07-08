@@ -19,6 +19,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const entrenamientosCollection = collection(db, "entrenamientos");
+const recetasCollection = collection(db, "recetas");
 
 // Export services
-export { app, auth, db, storage, entrenamientosCollection };
+export { app, auth, db, storage, entrenamientosCollection, recetasCollection };

@@ -10,9 +10,9 @@ const ROUTES = {
     script: "./pages/home/home.js",
   },
   "mi-plan": {
-    template: "/templates/mi-plan.html",
-    styles: "/css/pages/mi-plan.css",
-    script: "/js/pages/mi-plan.js",
+    template: "./templates/mi-plan.html",
+    styles: "./css/pages/mi-plan.css",
+    script: "./pages/mi-plan/mi-plan.js",
   },
   recetas: {
     template: "./templates/recetas.html",
@@ -35,6 +35,7 @@ class AppRouter {
   constructor() {
     this.mainContent = document.getElementById("app-main-content");
     this.currentPage = null;
+    this.currentModule = null; // Asegurarnos de que esta propiedad existe
     this.headerAvatar = document.getElementById("header-avatar");
     this.init();
   }
@@ -125,11 +126,16 @@ class AppRouter {
     if (this.currentPage === pageName) return;
 
     try {
+      // Limpiar completamente el estado anterior
+      await this.cleanupPreviousPage();
       this.currentPage = pageName;
       this.updateActiveNavLink(pageName);
 
       const route = ROUTES[pageName];
       if (!route) throw new Error("Página no encontrada");
+
+      // Mostrar loader mientras carga
+      this.mainContent.innerHTML = '<div class="page-loader">Cargando...</div>';
 
       // Cargar template
       const response = await fetch(route.template);
@@ -144,6 +150,29 @@ class AppRouter {
     } catch (error) {
       console.error(`Error loading page ${pageName}:`, error);
       showErrorPage(`Error al cargar ${pageName}`, error);
+    }
+  }
+
+  async cleanupPreviousPage() {
+    // Limpiar módulo anterior
+    if (
+      this.currentModule &&
+      typeof this.currentModule.cleanup === "function"
+    ) {
+      await this.currentModule.cleanup();
+      this.currentModule = null;
+    }
+
+    // Limpiar event listeners específicos de la página
+    this.mainContent.innerHTML = "";
+
+    // Cancelar cualquier solicitud pendiente de Firebase
+    // (Esto depende de cómo implementes tus queries)
+    if (window.activeFirebaseQueries) {
+      window.activeFirebaseQueries.forEach((query) => {
+        if (query && typeof query === "function") query();
+      });
+      window.activeFirebaseQueries = [];
     }
   }
 
@@ -178,7 +207,7 @@ class AppRouter {
     try {
       const module = await import(modulePath);
       if (typeof module.default === "function") {
-        this.currentModule = module.default();
+        this.currentModule = await module.default(); // Asegurar el await aquí
       }
     } catch (error) {
       console.warn(
