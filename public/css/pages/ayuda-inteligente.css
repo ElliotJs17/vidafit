@@ -1,17 +1,19 @@
 :root {
-  /* Nueva paleta de colores */
-  --color-primary: #4a6fa5;
-  --color-secondary: #166088;
-  --color-accent: #4fc3f7;
-  --color-success: #4caf50;
-  --color-warning: #ff9800;
-  --color-danger: #f44336;
-  --color-dark: #1a237e;
-  --color-light: #e8eaf6;
-  --color-text: #212121;
-  --color-text-light: #f5f5f5;
-  --color-bg: #f5f7fa;
-  --color-card: #ffffff;
+  /* Updated color palette to match main app and recetas.css */
+  --color-primary: #2d3748; /* Dark blue-gray */
+  --color-secondary: #66bb6a; /* Primary green */
+  --color-accent: #81c784; /* Light green */
+  --color-success: #66bb6a; /* Same as secondary */
+  --color-warning: #f39c12; /* Warning orange */
+  --color-danger: #ef4444; /* Danger red */
+  --color-dark: #1a202c; /* Dark background */
+  --color-light: #e2e8f0; /* Light gray */
+  --color-text: #f0f8ff; /* Main text color */
+  --color-text-light: #a0aec0; /* Secondary text */
+  --color-bg: #1a202c; /* Background color */
+  --color-card: #2d3748; /* Card background */
+  --color-dark-light: #2d3748; /* Lighter dark for cards */
+  --color-border: #4a5568; /* Border color */
 }
 
 .ayuda-inteligente-grid {
@@ -19,6 +21,7 @@
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
   padding: 2rem;
+  width: 90%;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -41,12 +44,12 @@
 
 .ayuda-header {
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid var(--color-light);
+  border-bottom: 2px solid var(--color-border);
   padding-bottom: 1rem;
 }
 
 .ayuda-header h2 {
-  color: var(--color-primary);
+  color: var(--color-secondary);
   margin: 0 0 1rem 0;
   font-size: 1.5rem;
   display: flex;
@@ -66,7 +69,7 @@
   border: none;
   border-radius: 8px;
   background-color: var(--color-light);
-  color: var(--color-text);
+  color: var(--color-primary);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -77,12 +80,12 @@
 }
 
 .modo-btn.active {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: var(--color-secondary);
+  color: var(--color-dark);
 }
 
 .modo-btn:not(.active):hover {
-  background-color: #e0e0e0;
+  background-color: var(--color-border);
 }
 
 .camara-container,
@@ -94,6 +97,9 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  /* Añade estas propiedades para evitar el layout shift */
+  min-height: 300px; /* Altura mínima aproximada para la cámara */
+  background-color: var(--color-primary); /* Color de fondo mientras carga */
 }
 
 video {
@@ -102,7 +108,9 @@ video {
   max-height: 400px;
   object-fit: cover;
   border-radius: 12px;
-  background-color: #000;
+  background-color: var(--color-primary);
+  /* Asegura que el video mantenga la relación de aspecto */
+  aspect-ratio: 16/9; /* Relación de aspecto estándar para video */
 }
 
 .camara-controls {
@@ -111,9 +119,38 @@ video {
   margin-top: 1rem;
 }
 
+/* Añade al final del archivo CSS */
+.camara-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.camara-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--color-secondary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .btn-primario {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: var(--color-secondary);
+  color: var(--color-dark);
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -126,13 +163,13 @@ video {
 }
 
 .btn-primario:hover {
-  background-color: var(--color-secondary);
+  background-color: var(--color-accent);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dropzone {
-  border: 2px dashed var(--color-primary);
+  border: 2px dashed var(--color-secondary);
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
@@ -143,12 +180,12 @@ video {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary);
-  background-color: rgba(74, 111, 165, 0.05);
+  color: var(--color-secondary);
+  background-color: rgba(102, 187, 106, 0.05);
 }
 
 .dropzone:hover {
-  background-color: rgba(74, 111, 165, 0.1);
+  background-color: rgba(102, 187, 106, 0.1);
 }
 
 .dropzone i {
@@ -171,20 +208,20 @@ video {
   color: var(--color-text);
   margin-bottom: 1rem;
   padding: 1rem;
-  background-color: var(--color-light);
+  background-color: var(--color-dark-light);
   border-radius: 8px;
 }
 
 .info-nutricional {
-  background-color: var(--color-light);
+  background-color: var(--color-dark-light);
   border-radius: 8px;
   padding: 1rem;
 }
 
 .info-nutricional h3 {
   margin-top: 0;
-  color: var(--color-primary);
-  border-bottom: 1px solid #ddd;
+  color: var(--color-secondary);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 0.5rem;
 }
 
@@ -201,15 +238,15 @@ video {
 }
 
 .info-nutricional li strong {
-  color: var(--color-secondary);
+  color: var(--color-accent);
 }
 
 .select-ejercicio {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid var(--color-light);
+  border: 2px solid var(--color-border);
   border-radius: 8px;
-  background-color: white;
+  background-color: var(--color-card);
   font-size: 1rem;
   color: var(--color-text);
   cursor: pointer;
@@ -217,7 +254,7 @@ video {
 }
 
 .select-ejercicio:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-secondary);
 }
 
 .feedback-container {
@@ -240,7 +277,7 @@ video {
 .puntuacion-bar {
   flex-grow: 1;
   height: 10px;
-  background-color: var(--color-light);
+  background-color: var(--color-border);
   border-radius: 5px;
   overflow: hidden;
 }
@@ -255,17 +292,18 @@ video {
 .ejercicio-guia {
   margin-top: 1.5rem;
   padding: 1rem;
-  background-color: var(--color-light);
+  background-color: var(--color-card);
   border-radius: 8px;
 }
 
 .ejercicio-guia h3 {
   margin-top: 0;
-  color: var(--color-primary);
+  color: var(--color-secondary);
 }
 
 .instrucciones-texto {
   line-height: 1.6;
+  color: var(--color-text-light);
 }
 
 /* Responsive */

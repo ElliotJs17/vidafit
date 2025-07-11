@@ -1,6 +1,7 @@
 export default async function () {
   // === CARGA Y VERIFICACIÓN DE LIBRERÍAS ===
   try {
+    // Cargar TensorFlow.js primero
     const tfScript = document.createElement("script");
     tfScript.src =
       "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js";
@@ -14,8 +15,11 @@ export default async function () {
 
     if (!window.tf) throw new Error("TensorFlow.js no se cargó correctamente");
 
-    console.log("✅ TensorFlow.js cargado correctamente");
+    // Esperar a que TensorFlow.js esté completamente listo
+    await window.tf.ready();
+    console.log("✅ TensorFlow.js cargado y listo");
 
+    // Cargar Teachable Machine después de TensorFlow.js
     const tmImageScript = document.createElement("script");
     tmImageScript.src =
       "https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js";
@@ -69,28 +73,6 @@ export default async function () {
         "Cadera hacia atrás",
       ],
     },
-    plancha: {
-      instrucciones: [
-        "1. Colócate boca abajo apoyando antebrazos y punta de los pies.",
-        "2. Mantén el cuerpo recto como una tabla, sin arquear la espalda.",
-        "3. Contrae el abdomen y glúteos.",
-        "4. Mantén la posición sin moverte.",
-      ],
-      puntosClave: ["Cuerpo recto", "Abdomen contraído", "Cabeza alineada"],
-    },
-    flexiones: {
-      instrucciones: [
-        "1. Boca abajo, manos a la altura del pecho, más abiertas que los hombros.",
-        "2. Mantén el cuerpo recto y baja el pecho hacia el suelo.",
-        "3. Empuja hacia arriba hasta extender los brazos.",
-        "4. Repite manteniendo la alineación.",
-      ],
-      puntosClave: [
-        "Cuerpo recto",
-        "Movimiento controlado",
-        "Codos no muy abiertos",
-      ],
-    },
   };
 
   // === ELEMENTOS DEL DOM ===
@@ -125,6 +107,7 @@ export default async function () {
   let streamEjercicio = null;
   let loopEjercicio = null;
   let ejercicioActual = null;
+  let isAnalyzing = false;
 
   // === FUNCIONES COMIDA ===
   async function iniciarCamaraComida() {
@@ -167,9 +150,6 @@ export default async function () {
     if (modeloComida) return modeloComida;
 
     try {
-      const tmImage = await import(
-        "https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"
-      );
       const modelURL =
         "https://teachablemachine.withgoogle.com/models/ucTRDfrN2/model.json";
       const metadataURL =
@@ -206,34 +186,45 @@ export default async function () {
 
   function mostrarInfoNutricional(plato) {
     const infoPorPlato = {
-      Huancaina: {
-        calorias: 550,
-        proteina: "25g",
-        carbohidratos: "60g",
-        grasas: "20g",
-        descripcion: "Plato tradicional con arroz, pollo y verduras.",
-      },
       "Lomo Saltado": {
-        calorias: 350,
-        proteina: "15g",
-        carbohidratos: "20g",
+        calorias: 550,
+        proteina: "30g",
+        carbohidratos: "40g",
         grasas: "25g",
         descripcion:
-          "Ensalada con lechuga, croutones, queso parmesano y aderezo César.",
+          "Salteado de carne, cebolla, tomate y papas fritas con arroz.",
       },
-      "Sopa de Verduras": {
-        calorias: 200,
-        proteina: "8g",
-        carbohidratos: "15g",
-        grasas: "5g",
-        descripcion: "Sopa ligera con variedad de verduras frescas.",
+      "Aji de Gallina": {
+        calorias: 480,
+        proteina: "28g",
+        carbohidratos: "35g",
+        grasas: "22g",
+        descripcion:
+          "Guiso cremoso de gallina con ají amarillo, pan y leche, acompañado de arroz.",
       },
-      "Pasta Bolognesa": {
-        calorias: 600,
-        proteina: "30g",
-        carbohidratos: "80g",
-        grasas: "25g",
-        descripcion: "Pasta con salsa de carne molida y tomate.",
+      "Causa Limeña": {
+        calorias: 400,
+        proteina: "15g",
+        carbohidratos: "30g",
+        grasas: "20g",
+        descripcion:
+          "Puré de papa amarilla relleno de pollo o atún con mayonesa.",
+      },
+      "Seco de Res con Frijoles": {
+        calorias: 650,
+        proteina: "35g",
+        carbohidratos: "50g",
+        grasas: "30g",
+        descripcion:
+          "Estofado de carne de res con culantro, acompañado de frijoles y arroz.",
+      },
+      Tallarines: {
+        calorias: 700,
+        proteina: "35g",
+        carbohidratos: "60g",
+        grasas: "35g",
+        descripcion:
+          "Pasta con salsa de albahaca y espinaca, servido con bistec frito.",
       },
     };
 
@@ -279,13 +270,26 @@ export default async function () {
 
       streamEjercicio = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 640 },
+          height: { ideal: 480 },
           facingMode: "user",
         },
       });
       videoEjercicio.srcObject = streamEjercicio;
-      return true;
+
+      // Esperar a que el video esté completamente cargado
+      return new Promise((resolve, reject) => {
+        videoEjercicio.onloadedmetadata = () => {
+          videoEjercicio
+            .play()
+            .then(() => {
+              console.log("Video de ejercicio iniciado correctamente");
+              resolve(true);
+            })
+            .catch(reject);
+        };
+        videoEjercicio.onerror = reject;
+      });
     } catch (e) {
       console.error("Error al acceder a la cámara de ejercicio:", e);
       resultadoEjercicio.textContent =
@@ -304,19 +308,17 @@ export default async function () {
       cancelAnimationFrame(loopEjercicio);
       loopEjercicio = null;
     }
+    isAnalyzing = false;
   }
 
   async function cargarModeloEjercicio() {
     if (modeloEjercicio) return modeloEjercicio;
 
     try {
-      const tmPose = await import(
-        "https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"
-      );
       const modelURL =
-        "https://teachablemachine.withgoogle.com/models/XXXX_EJERCICIO/model.json";
+        "https://teachablemachine.withgoogle.com/models/_s2kqbYtw/model.json";
       const metadataURL =
-        "https://teachablemachine.withgoogle.com/models/XXXX_EJERCICIO/metadata.json";
+        "https://teachablemachine.withgoogle.com/models/_s2kqbYtw/metadata.json";
 
       modeloEjercicio = await window.tmPose.load(modelURL, metadataURL);
       console.log("Modelo de ejercicio cargado correctamente");
@@ -327,58 +329,210 @@ export default async function () {
     }
   }
 
+  async function analizarPoseSentadilla() {
+    try {
+      // Verificar que el video esté listo y reproduciendo
+      if (
+        !videoEjercicio ||
+        videoEjercicio.readyState !== HTMLMediaElement.HAVE_ENOUGH_DATA ||
+        videoEjercicio.paused
+      ) {
+        return null;
+      }
+
+      // Verificar que el modelo esté cargado
+      if (!modeloEjercicio) {
+        await cargarModeloEjercicio();
+      }
+
+      // Usar estimatePose directamente con el elemento video
+      const prediction = await modeloEjercicio.estimatePose(videoEjercicio);
+      return prediction;
+    } catch (error) {
+      console.error("Error analizando pose:", error);
+      return null;
+    }
+  }
+
+  function evaluarSentadilla(prediction) {
+    if (!prediction || !prediction.pose || !prediction.pose.keypoints) {
+      return {
+        esCorrecta: false,
+        mensaje: "No se detectó postura",
+        puntuacion: 0,
+      };
+    }
+
+    const keypoints = prediction.pose.keypoints;
+
+    // Obtener puntos clave con verificación de confianza
+    const obtenerPunto = (nombre) => {
+      const punto = keypoints.find((k) => k.part === nombre);
+      return punto && punto.score > 0.5 ? punto : null;
+    };
+
+    const nariz = obtenerPunto("nose");
+    const caderaIzq = obtenerPunto("leftHip");
+    const caderaDer = obtenerPunto("rightHip");
+    const rodillaIzq = obtenerPunto("leftKnee");
+    const rodillaDer = obtenerPunto("rightKnee");
+    const tobilloIzq = obtenerPunto("leftAnkle");
+    const tobilloDer = obtenerPunto("rightAnkle");
+    const hombroIzq = obtenerPunto("leftShoulder");
+    const hombroDer = obtenerPunto("rightShoulder");
+
+    // Verificar que tengamos suficientes puntos clave
+    const puntosRequeridos = [
+      caderaIzq,
+      caderaDer,
+      rodillaIzq,
+      rodillaDer,
+      tobilloIzq,
+      tobilloDer,
+    ];
+    const puntosValidos = puntosRequeridos.filter((p) => p !== null);
+
+    if (puntosValidos.length < 4) {
+      return {
+        esCorrecta: false,
+        mensaje: "Posiciónate mejor frente a la cámara",
+        puntuacion: 0,
+      };
+    }
+
+    // Evaluar criterios de forma
+    let puntuacion = 100;
+    const errores = [];
+
+    // 1. Profundidad de la sentadilla (usando caderas y rodillas)
+    if (caderaIzq && rodillaIzq) {
+      const profundidad = caderaIzq.position.y - rodillaIzq.position.y;
+      if (profundidad < 20) {
+        errores.push("Baja más en la sentadilla");
+        puntuacion -= 30;
+      }
+    }
+
+    // 2. Alineación de rodillas (no deben pasar mucho los tobillos)
+    if (rodillaIzq && tobilloIzq) {
+      const desplazamientoIzq = Math.abs(
+        rodillaIzq.position.x - tobilloIzq.position.x
+      );
+      if (desplazamientoIzq > 50) {
+        errores.push("Rodilla izquierda muy adelantada");
+        puntuacion -= 20;
+      }
+    }
+
+    if (rodillaDer && tobilloDer) {
+      const desplazamientoDer = Math.abs(
+        rodillaDer.position.x - tobilloDer.position.x
+      );
+      if (desplazamientoDer > 50) {
+        errores.push("Rodilla derecha muy adelantada");
+        puntuacion -= 20;
+      }
+    }
+
+    // 3. Postura del torso (usando hombros y caderas)
+    if (hombroIzq && hombroDer && caderaIzq && caderaDer) {
+      const centroHombros = (hombroIzq.position.x + hombroDer.position.x) / 2;
+      const centroCaderas = (caderaIzq.position.x + caderaDer.position.x) / 2;
+      const inclinacion = Math.abs(centroHombros - centroCaderas);
+
+      if (inclinacion > 40) {
+        errores.push("Mantén el torso más erguido");
+        puntuacion -= 25;
+      }
+    }
+
+    // Asegurar que la puntuación no sea negativa
+    puntuacion = Math.max(0, puntuacion);
+
+    const esCorrecta = errores.length === 0;
+    const mensaje = esCorrecta ? "¡Excelente forma!" : errores.join(", ");
+
+    return { esCorrecta, mensaje, puntuacion };
+  }
+
   async function detectarPostura() {
-    if (!ejercicioActual) return;
+    if (!ejercicioActual || isAnalyzing) return;
 
     try {
-      if (!modeloEjercicio) await cargarModeloEjercicio();
+      // Cargar modelo si no está cargado
+      if (!modeloEjercicio) {
+        resultadoEjercicio.textContent = "Cargando modelo de ejercicio...";
+        await cargarModeloEjercicio();
+      }
+
+      // Iniciar cámara si no está activa
       if (!streamEjercicio) {
+        resultadoEjercicio.textContent = "Iniciando cámara...";
         const camaraLista = await iniciarCamaraEjercicio();
         if (!camaraLista) return;
       }
 
-      if (loopEjercicio) cancelAnimationFrame(loopEjercicio);
+      isAnalyzing = true;
+      resultadoEjercicio.textContent = "Analizando postura...";
 
-      loopEjercicio = async function () {
-        const pred = await modeloEjercicio.predict();
-        pred.sort((a, b) => b.probability - a.probability);
+      // Detener loop anterior si existe
+      if (loopEjercicio) {
+        cancelAnimationFrame(loopEjercicio);
+      }
 
-        const postura = pred[0].className;
-        const prob = (pred[0].probability * 100).toFixed(2);
+      // Función de bucle de análisis
+      const ejecutarLoop = async () => {
+        if (!isAnalyzing || !ejercicioActual) return;
 
-        resultadoEjercicio.textContent = `Postura: ${postura}`;
-        puntuacionEjercicio.style.width = `${prob}%`;
-        puntuacionTexto.textContent = `${prob}%`;
+        try {
+          if (ejercicioActual === "sentadilla") {
+            const prediction = await analizarPoseSentadilla();
 
-        if (prob > 80) {
-          puntuacionEjercicio.style.backgroundColor = "var(--color-success)";
-        } else if (prob > 50) {
-          puntuacionEjercicio.style.backgroundColor = "var(--color-warning)";
-        } else {
-          puntuacionEjercicio.style.backgroundColor = "var(--color-danger)";
+            if (prediction) {
+              const { esCorrecta, mensaje, puntuacion } =
+                evaluarSentadilla(prediction);
+
+              // Actualizar interfaz
+              resultadoEjercicio.textContent = `Sentadilla: ${mensaje}`;
+              puntuacionEjercicio.style.width = `${puntuacion}%`;
+              puntuacionTexto.textContent = `${puntuacion}%`;
+
+              // Cambiar color según puntuación
+              if (puntuacion >= 80) {
+                puntuacionEjercicio.style.backgroundColor = "#4CAF50"; // Verde
+              } else if (puntuacion >= 60) {
+                puntuacionEjercicio.style.backgroundColor = "#FF9800"; // Naranja
+              } else {
+                puntuacionEjercicio.style.backgroundColor = "#F44336"; // Rojo
+              }
+            } else {
+              resultadoEjercicio.textContent = "Posiciónate frente a la cámara";
+              puntuacionEjercicio.style.width = "0%";
+              puntuacionTexto.textContent = "0%";
+            }
+          } else {
+            resultadoEjercicio.textContent = "Ejercicio no implementado";
+            puntuacionEjercicio.style.width = "0%";
+            puntuacionTexto.textContent = "0%";
+          }
+        } catch (error) {
+          console.error("Error en el bucle de detección:", error);
+          resultadoEjercicio.textContent = "Error al analizar postura";
         }
 
-        darFeedbackEjercicio(postura, prob);
-        loopEjercicio = requestAnimationFrame(loopEjercicio);
+        // Continuar el bucle si sigue analizando
+        if (isAnalyzing) {
+          loopEjercicio = requestAnimationFrame(ejecutarLoop);
+        }
       };
 
-      loopEjercicio();
+      // Iniciar el bucle
+      ejecutarLoop();
     } catch (error) {
       console.error("Error en detección de postura:", error);
       resultadoEjercicio.textContent =
-        "Error al analizar la postura. Intenta de nuevo.";
-    }
-  }
-
-  function darFeedbackEjercicio(postura, probabilidad) {
-    if (probabilidad < 50) {
-      resultadoEjercicio.textContent +=
-        " - Postura incorrecta. Revisa las instrucciones.";
-    } else if (probabilidad < 80) {
-      resultadoEjercicio.textContent +=
-        " - Postura aceptable pero puede mejorar.";
-    } else {
-      resultadoEjercicio.textContent += " - ¡Excelente postura!";
+        "Error al inicializar análisis de postura";
+      isAnalyzing = false;
     }
   }
 
@@ -493,6 +647,13 @@ export default async function () {
   });
 
   ejercicioSeleccionado.addEventListener("change", async (e) => {
+    // Detener análisis anterior
+    isAnalyzing = false;
+    if (loopEjercicio) {
+      cancelAnimationFrame(loopEjercicio);
+      loopEjercicio = null;
+    }
+
     ejercicioActual = e.target.value;
     mostrarInstruccionesEjercicio(ejercicioActual);
 
@@ -519,7 +680,7 @@ export default async function () {
         cargarModeloEjercicio().catch((e) =>
           console.error("Error precargando modelo ejercicio:", e)
         );
-      }, 1000);
+      }, 2000);
 
       resultadoComida.textContent =
         "Toma una foto de tu comida o sube una imagen para analizarla.";
@@ -536,6 +697,10 @@ export default async function () {
     cleanup() {
       detenerCamaraComida();
       detenerCamaraEjercicio();
+      isAnalyzing = false;
+      if (loopEjercicio) {
+        cancelAnimationFrame(loopEjercicio);
+      }
       modeloComida = null;
       modeloEjercicio = null;
     },
