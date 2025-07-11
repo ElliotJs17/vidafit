@@ -1,60 +1,63 @@
-import { DIAS_SEMANA, TIPOS_COMIDA } from "./mi-plan.constants.js";
+import { TIPOS_COMIDA } from "./mi-plan.constants.js";
 import elements from "./mi-plan.elements.js";
 import { makeDraggable } from "./mi-plan.utils.js";
 
 export function renderWeekGrid(plan, weekRange) {
-  elements.semanaGrid.innerHTML = "";
-  elements.currentWeek.textContent = weekRange.string;
+  if (!elements.semanaGrid) return;
+  //elements.semanaGrid.innerHTML = "";
+  //elements.currentWeek.textContent = weekRange.string;
 
-  DIAS_SEMANA.forEach((dia) => {
-    const dayPlan = plan?.dias?.find((d) => d.fecha === dia.id) || {
-      fecha: dia.id,
-      comidas: TIPOS_COMIDA.map((tipo) => ({ tipo: tipo.id, receta: null })),
-      entrenamientos: [],
-    };
+    // elements.semanaGrid.innerHTML = "";
+    if (!elements.semanaGrid) return;
+    elements.semanaGrid.innerHTML = "";
 
-    const comidasParaRender = TIPOS_COMIDA.map((tipo) => {
-      return (
-        dayPlan.comidas.find((c) => c.tipo === tipo.id) || {
-          tipo: tipo.id,
-          receta: null,
-        }
-      );
-    });
-
-    const dayElement = document.createElement("div");
-    dayElement.className = "dia-card";
-    dayElement.dataset.dia = dia.id;
-    dayElement.innerHTML = `
-      <h4>${dia.nombre}</h4>
-      <div class="comidas-slots">
-        ${comidasParaRender
-          .map(
-            (comidaSlot) => `
-          <div class="slot comida-slot" data-tipo="${
-            comidaSlot.tipo
-          }" data-dia="${dia.id}">
-            <span>${
-              TIPOS_COMIDA.find((t) => t.id === comidaSlot.tipo)?.nombre ||
-              comidaSlot.tipo
-            }</span>
-            ${renderComidaSlot(comidaSlot.receta, comidaSlot.tipo, dia.id)}
-          </div>
-        `
-          )
-          .join("")}
-      </div>
-      <div class="entrenamiento-slot-container">
-        <div class="slot entrenamiento-slot" data-tipo="entrenamiento" data-dia="${
-          dia.id
-        }">
-          <span>Entrenamiento</span>
-          ${renderEntrenamientoSlot(dayPlan.entrenamientos[0], dia.id)}
-        </div>
-      </div>
-    `;
+    if (elements.semanaGrid) {
     elements.semanaGrid.appendChild(dayElement);
+    }
+
+    plan.dias.forEach((diaObj, index) => {
+  const fecha = diaObj.fecha; // p. ej., "2025-07-07"
+  const nombreDia = DIAS_SEMANA[index]?.nombre || fecha; // Lunes, Martes, etc.
+
+  const comidasParaRender = TIPOS_COMIDA.map((tipo) => {
+    return (
+      diaObj.comidas.find((c) => c.tipo === tipo.id) || {
+        tipo: tipo.id,
+        receta: null,
+      }
+    );
   });
+
+  const dayElement = document.createElement("div");
+  dayElement.className = "dia-card";
+  dayElement.dataset.dia = fecha;
+  dayElement.innerHTML = `
+    <h4>${nombreDia}</h4>
+    <div class="comidas-slots">
+      ${comidasParaRender
+        .map(
+          (comidaSlot) => `
+        <div class="slot comida-slot" data-tipo="${comidaSlot.tipo}" data-dia="${fecha}">
+          <span>${
+            TIPOS_COMIDA.find((t) => t.id === comidaSlot.tipo)?.nombre || comidaSlot.tipo
+          }</span>
+          ${renderComidaSlot(comidaSlot.receta, comidaSlot.tipo, fecha)}
+        </div>
+      `
+        )
+        .join("")}
+    </div>
+    <div class="entrenamiento-slot-container">
+      <div class="slot entrenamiento-slot" data-tipo="entrenamiento" data-dia="${fecha}">
+        <span>Entrenamiento</span>
+        ${renderEntrenamientoSlot(diaObj.entrenamientos[0], fecha)}
+      </div>
+    </div>
+  `;
+  elements.semanaGrid.appendChild(dayElement);
+});
+
+  
 }
 
 function renderComidaSlot(receta, slotType, dayId) {
@@ -94,20 +97,19 @@ export function renderRecetasList(recetas) {
   elements.recetasList.innerHTML = recetas
     .map(
       (receta) => `
-    <div class="receta-item" data-id="${receta.id}">
-      <img src="${receta.imagenUrl || "placeholder.jpg"}" alt="${
-        receta.nombre
-      }">
-      <div class="receta-info">
-        <h5>${receta.nombre}</h5>
-        <span>${receta.calorias} cal</span>
-        <span>${receta.tiempoPreparacion} min</span>
-      </div>
-    </div>
-  `
+        <div class="item-card receta-item" data-id="${receta.id}" data-type="receta">
+          <input type="checkbox" class="item-checkbox" />
+          <img src="${receta.imagenUrl || "placeholder.jpg"}" alt="${receta.nombre}">
+          <div class="receta-info">
+            <span class="name">${receta.nombre}</span>
+            <span>${receta.calorias} cal | ${receta.tiempoPreparacion} min</span>
+          </div>
+        </div>
+      `
     )
     .join("");
 
+  // Si quieres que aún sea draggable
   document.querySelectorAll(".receta-item").forEach((item) => {
     const receta = recetas.find((r) => r.id === item.dataset.id);
     makeDraggable(item, {
@@ -126,20 +128,25 @@ export function renderRecetasList(recetas) {
   });
 }
 
+
 export function renderEntrenamientosList(entrenamientos) {
-  elements.entrenamientosList.innerHTML = entrenamientos
-    .map(
-      (ent) => `
-    <div class="entrenamiento-item" data-id="${ent.id}">
-      <div class="entrenamiento-info">
-        <h5>${ent.nombre}</h5>
-        <span>⏱️ ${ent.duracion} min</span>
-        <span>🔥 ${ent.calorias || 0} cal</span>
+ elements.entrenamientosList.innerHTML = entrenamientos
+  .map(
+    (ent) => `
+      <div class="item-card entrenamiento-item" data-id="${ent.id}" data-type="entrenamiento">
+        <input type="checkbox" class="item-checkbox" />
+        <div class="entrenamiento-info">
+          <span class="name">${ent.nombre}</span>
+          <span>⏱️ ${ent.duracion} min | 🔥 ${ent.calorias || 0} cal</span>
+          <span>🏋️ Tipo: ${ent.tipo || "N/A"}</span>
+          <span>🎯 Objetivo: ${ent.objetivo || "N/A"}</span>
+          <span>💪 Nivel: ${ent.nivel || "N/A"}</span>
+        </div>
       </div>
-    </div>
-  `
-    )
-    .join("");
+    `
+  )
+  .join("");
+
 
   document.querySelectorAll(".entrenamiento-item").forEach((item) => {
     const ent = entrenamientos.find((e) => e.id === item.dataset.id);
@@ -153,3 +160,4 @@ export function renderEntrenamientosList(entrenamientos) {
     });
   });
 }
+
