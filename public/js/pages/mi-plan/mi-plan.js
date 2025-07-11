@@ -1,6 +1,5 @@
 import elements from "./mi-plan.elements.js";
 import { DIAS_SEMANA, TIPOS_COMIDA } from "./mi-plan.constants.js";
-import { initCalendar } from "./calendar-init.js";
 import {
   initFirestore,
   getRecetasCollection,
@@ -25,6 +24,8 @@ import {
   renderRecetasList,
   renderEntrenamientosList,
 } from "./mi-plan.render.js";
+import { initCalendar, crearEventosDesdePlan 
+  } from "./calendar-init.js";
 
 // Estado global
 let currentWeek = getWeekRange();
@@ -33,10 +34,9 @@ let currentUserId = null;
 // Inicialización
 async function init() {
   try {
-    // Obtener usuario autenticado (debes implementar esta función según tu auth system)
     const user = await getCurrentUser();
     if (!user) {
-      window.location.href = "/index.html"; // Redirige si no hay usuario
+      window.location.href = "/index.html";
       return;
     }
     currentUserId = user.uid;
@@ -48,13 +48,16 @@ async function init() {
     }
 
     await loadInitialData();
+    
+    // Renderizar la semana actual
     setupEventListeners();
-    initCalendar(); // Inicializar el calendario
+    // ❌ ya no llames initCalendar() aquí
   } catch (error) {
     console.error("Error inicializando Mi Plan:", error);
     showError("Ocurrió un error al iniciar la aplicación.");
   }
 }
+
 
 // Función placeholder para obtener el usuario actual
 // DEBES IMPLEMENTAR ESTA FUNCIÓN SEGÚN TU SISTEMA DE AUTENTICACIÓN (ej. Firebase Auth)
@@ -73,17 +76,25 @@ async function getCurrentUser() {
 async function loadInitialData() {
   try {
     showLoading();
-    const plan = await loadUserPlan(currentUserId, currentWeek.id);
-    setCurrentPlan(plan);
-    renderWeekGrid(plan, currentWeek);
-    updateNutritionTotals(plan);
 
-    // Cargar recetas y entrenamientos para el sidebar
+    const plan = await loadUserPlan(currentUserId, currentWeek.id);
     const recetas = await loadRecetas();
     const entrenamientos = await loadEntrenamientos();
 
+    // Agrega recetas y entrenamientos al plan
+    plan.allRecetas = recetas;
+    plan.allEntrenamientos = entrenamientos;
+
+    setCurrentPlan(plan);
+
+    renderWeekGrid(plan, currentWeek);
+    updateNutritionTotals(plan);
     renderRecetasList(recetas);
     renderEntrenamientosList(entrenamientos);
+
+    const eventos = crearEventosDesdePlan(plan); // ✅ Generar eventos
+    initCalendar(eventos); // ✅ Renderizar calendario con eventos
+
     hideLoading();
   } catch (error) {
     console.error("Error cargando datos iniciales:", error);
@@ -91,6 +102,8 @@ async function loadInitialData() {
     hideLoading();
   }
 }
+
+
 
 async function loadRecetas() {
   try {
@@ -118,23 +131,97 @@ async function loadEntrenamientos() {
   }
 }
 
+// Asignar receta automáticamente a la siguiente fecha disponible
+async function asignarRecetaEnFechaDisponible(tipoComida, receta) {
+  const plan = getCurrentPlan();
+  let fechaActual = new Date(); // hoy
+  let maxDias = 14;
+  let fechaISO = fechaActual.toISOString().split("T")[0];
+
+  while (maxDias-- > 0) {
+    const dia = plan.dias.find((d) => d.fecha === fechaISO);
+    const yaOcupado = dia?.comidas?.some((c) => c.tipo === tipoComida && c.receta);
+
+    if (!yaOcupado) {
+      await assignItemToDay(fechaISO, tipoComida, receta);
+      return;
+    }
+
+    // siguiente día
+    fechaActual.setDate(fechaActual.getDate() + 1);
+    fechaISO = fechaActual.toISOString().split("T")[0];
+  }
+
+  showError("No se encontró una fecha libre para esta receta.");
+}
+
+// Asignar entrenamiento automáticamente a la siguiente fecha disponible
+async function asignarEntrenamientoEnFechaDisponible(entrenamiento) {
+  const plan = getCurrentPlan();
+  let fechaActual = new Date(); // hoy
+  let maxDias = 14;
+  let fechaISO = fechaActual.toISOString().split("T")[0];
+
+  while (maxDias-- > 0) {
+    const dia = plan.dias.find((d) => d.fecha === fechaISO);
+    const yaOcupado = dia?.entrenamientos?.length > 0;
+
+    if (!yaOcupado) {
+      await assignItemToDay(fechaISO, "entrenamiento", entrenamiento);
+      return;
+    }
+
+    fechaActual.setDate(fechaActual.getDate() + 1);
+    fechaISO = fechaActual.toISOString().split("T")[0];
+  }
+
+  showError("No se encontró una fecha libre para este entrenamiento.");
+}
+
 function setupEventListeners() {
-  // Navegación semanal
-  elements.prevWeek.addEventListener("click", async () => {
-    const prevMonday = new Date(currentWeek.start);
-    prevMonday.setDate(prevMonday.getDate() - 7);
-    currentWeek = getWeekRange(prevMonday);
+  const lunesISO = currentWeek.start.toISOString().split("T")[0]; // ✅ Fecha real de lunes
+
+  // Botón: Agregar recetas
+  elements.btnAgregarRecetas.addEventListener("click", async () => {
+    const selected = [...elements.recetasList.querySelectorAll(".item-card input:checked")]
+      .map((checkbox) => checkbox.closest(".item-card"));
+
+    const plan = getCurrentPlan();
+
+    for (const item of selected) {
+      const recetaId = item.dataset.id;
+      const receta = plan.allRecetas.find((r) => r.id === recetaId);
+      if (receta) {
+        await asignarRecetaEnFechaDisponible("desayuno", receta);
+ // ✅ Usa fecha válida
+      }
+    }
+
     await loadInitialData();
+    showSuccess("Recetas agregadas al plan.");
   });
 
-  elements.nextWeek.addEventListener("click", async () => {
-    const nextMonday = new Date(currentWeek.start);
-    nextMonday.setDate(nextMonday.getDate() + 7);
-    currentWeek = getWeekRange(nextMonday);
+  // Botón: Agregar entrenamientos
+  elements.btnAgregarEntrenamientos.addEventListener("click", async () => {
+    const selected = [...elements.entrenamientosList.querySelectorAll(".item-card input:checked")]
+      .map((checkbox) => checkbox.closest(".item-card"));
+
+    const plan = getCurrentPlan();
+
+    for (const item of selected) {
+      const entrenamientoId = item.dataset.id;
+      const entrenamiento = plan.allEntrenamientos.find((e) => e.id === entrenamientoId);
+      if (entrenamiento) {
+        await asignarEntrenamientoEnFechaDisponible(entrenamiento);
+ // ✅ Usa fecha válida
+      }
+    }
+
     await loadInitialData();
+    showSuccess("Entrenamientos agregados al plan.");
   });
 
-  // Event listeners para pestañas del sidebar
+  // Tabs del sidebar
   document.querySelectorAll(".tab-btn").forEach((button) => {
     button.addEventListener("click", (e) => {
       const tab = e.target.dataset.tab;
@@ -151,86 +238,10 @@ function setupEventListeners() {
     });
   });
 
-  // Event listeners para drag & drop en el plan semanal
-  elements.semanaGrid.addEventListener("dragover", (e) => {
-    e.preventDefault(); // Permite el drop
-    const slot = e.target.closest(".slot");
-    if (slot) {
-      slot.classList.add("drag-over");
-    }
-  });
-
-  elements.semanaGrid.addEventListener("dragleave", (e) => {
-    const slot = e.target.closest(".slot");
-    if (slot) {
-      slot.classList.remove("drag-over");
-    }
-  });
-
-  elements.semanaGrid.addEventListener("drop", async (e) => {
-    e.preventDefault();
-    const slot = e.target.closest(".slot");
-    if (!slot) return;
-
-    slot.classList.remove("drag-over");
-
-    try {
-      const data = JSON.parse(e.dataTransfer.getData("text/plain"));
-      const dayId = slot.dataset.dia;
-      const slotType = slot.dataset.tipo;
-
-      if (slotType === "entrenamiento" && data.type !== "entrenamiento") {
-        showError(
-          "Solo puedes arrastrar entrenamientos a los slots de entrenamiento."
-        );
-        return;
-      }
-      if (slotType !== "entrenamiento" && data.type === "entrenamiento") {
-        showError("No puedes arrastrar entrenamientos a los slots de comida.");
-        return;
-      }
-
-      await assignItemToDay(dayId, slotType, data);
-      await loadInitialData(); // Recargar datos para reflejar cambios y actualizar totales
-      showSuccess("Elemento asignado correctamente.");
-    } catch (error) {
-      console.error("Error en drop:", error);
-      showError("Error al asignar elemento al plan.");
-    }
-  });
-
-  // Remover elemento del día
-  elements.semanaGrid.addEventListener("click", async (e) => {
-    const removeBtn = e.target.closest(".btn-remove");
-    if (removeBtn) {
-      const itemElement = removeBtn.closest(
-        ".comida-item, .entrenamiento-item"
-      );
-      const slotElement = removeBtn.closest(".slot");
-
-      if (!itemElement || !slotElement) return;
-
-      const dayId = slotElement.dataset.dia;
-      const slotType = slotElement.dataset.tipo;
-      const itemId = itemElement.dataset.id; // Asume que la receta/entrenamiento tiene un ID
-
-      if (confirm("¿Estás seguro de que quieres eliminar este elemento?")) {
-        try {
-          await removeItemFromDay(dayId, slotType, itemId);
-          await loadInitialData();
-          showSuccess("Elemento eliminado del plan.");
-        } catch (error) {
-          console.error("Error eliminando elemento:", error);
-          showError("Error al eliminar el elemento.");
-        }
-      }
-    }
-  });
-
-  // Búsqueda de recetas y entrenamientos
+  // Búsqueda de recetas
   elements.buscarRecetas.addEventListener("input", (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    const allRecetas = getCurrentPlan().allRecetas || []; // Asume que tienes todas las recetas cargadas
+    const allRecetas = getCurrentPlan().allRecetas || [];
     const filteredRecetas = allRecetas.filter(
       (receta) =>
         receta.nombre.toLowerCase().includes(searchTerm) ||
@@ -239,9 +250,10 @@ function setupEventListeners() {
     renderRecetasList(filteredRecetas);
   });
 
+  // Búsqueda de entrenamientos
   elements.buscarEntrenamientos.addEventListener("input", (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    const allEntrenamientos = getCurrentPlan().allEntrenamientos || []; // Asume que tienes todos los entrenamientos cargados
+    const allEntrenamientos = getCurrentPlan().allEntrenamientos || [];
     const filteredEntrenamientos = allEntrenamientos.filter(
       (ent) =>
         ent.nombre.toLowerCase().includes(searchTerm) ||
@@ -249,8 +261,8 @@ function setupEventListeners() {
     );
     renderEntrenamientosList(filteredEntrenamientos);
   });
-
-  // Modal de estadísticas
+  /*
+  // Modal estadísticas
   elements.btnEstadisticas.addEventListener("click", () => {
     elements.modalEstadisticas.style.display = "block";
     renderStats();
@@ -260,32 +272,12 @@ function setupEventListeners() {
     elements.modalEstadisticas.style.display = "none";
   });
 
-  // Modal de detalles
-  elements.semanaGrid.addEventListener("click", (e) => {
-    const detailBtn = e.target.closest(".btn-detail");
-    if (detailBtn) {
-      const type = detailBtn.dataset.type;
-      const id = detailBtn.dataset.id;
-      const plan = getCurrentPlan();
-      let item = null;
-
-      if (type === "receta") {
-        item = plan.allRecetas?.find((r) => r.id === id);
-      } else if (type === "entrenamiento") {
-        item = plan.allEntrenamientos?.find((e) => e.id === id);
-      }
-
-      if (item) {
-        renderDetalleModal(item, type);
-        elements.modalDetalles.style.display = "block";
-      }
-    }
-  });
-
+  // Modal detalles
   elements.closeDetalles.addEventListener("click", () => {
     elements.modalDetalles.style.display = "none";
-  });
+  });*/
 }
+
 
 function updateNutritionTotals(plan) {
   const totals = calculateNutritionTotals(plan);
