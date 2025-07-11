@@ -1,0 +1,84 @@
+<section class="ayuda-inteligente-grid">
+  <!-- Comidas -->
+  <div class="ayuda-bloque ayuda-comida">
+    <div class="ayuda-header">
+      <h2><i class="fas fa-utensils"></i> Identificador de Comidas</h2>
+      <div class="modo-seleccion">
+        <button class="modo-btn active" data-modo="camara">
+          <i class="fas fa-camera"></i> Cámara
+        </button>
+        <button class="modo-btn" data-modo="subir">
+          <i class="fas fa-upload"></i> Subir Imagen
+        </button>
+      </div>
+    </div>
+
+    <div class="camara-container" id="camaraComidaContainer">
+      <video id="webcamComida" autoplay playsinline></video>
+      <div class="camara-controls">
+        <button id="capturarComida" class="btn-primario">
+          <i class="fas fa-camera"></i> Capturar
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="subir-container"
+      id="subirComidaContainer"
+      style="display: none"
+    >
+      <div class="dropzone" id="dropzoneComida">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Arrastra una imagen aquí o haz clic para seleccionar</p>
+        <input
+          type="file"
+          id="inputFileComida"
+          accept="image/*"
+          style="display: none"
+        />
+      </div>
+    </div>
+
+    <canvas id="canvasComida" style="display: none"></canvas>
+
+    <div class="resultado-container">
+      <div id="resultadoComida" class="resultado-texto"></div>
+      <div id="infoNutricional" class="info-nutricional"></div>
+    </div>
+  </div>
+
+  <!-- Ejercicios -->
+  <div class="ayuda-bloque ayuda-ejercicio">
+    <div class="ayuda-header">
+      <h2><i class="fas fa-dumbbell"></i> Entrenador Postural</h2>
+      <div class="ejercicio-selector">
+        <select id="ejercicioSeleccionado" class="select-ejercicio">
+          <option value="">Selecciona un ejercicio</option>
+          <option value="sentadilla">Sentadilla</option>
+          <option value="plancha">Plancha</option>
+          <option value="flexiones">Flexiones</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="camara-container">
+      <video id="webcamEjercicio" autoplay playsinline></video>
+      <div class="feedback-container">
+        <div id="resultadoEjercicio" class="feedback-texto"></div>
+        <div class="feedback-visual">
+          <div class="puntuacion-bar">
+            <div id="puntuacionEjercicio" class="puntuacion-fill"></div>
+          </div>
+          <span id="puntuacionTexto">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ejercicio-guia">
+      <h3>Instrucciones:</h3>
+      <div id="instruccionesEjercicio" class="instrucciones-texto">
+        Selecciona un ejercicio para ver las instrucciones.
+      </div>
+    </div>
+  </div>
+</section>

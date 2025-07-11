@@ -1,0 +1,281 @@
+:root {
+  /* Nueva paleta de colores */
+  --color-primary: #4a6fa5;
+  --color-secondary: #166088;
+  --color-accent: #4fc3f7;
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  --color-danger: #f44336;
+  --color-dark: #1a237e;
+  --color-light: #e8eaf6;
+  --color-text: #212121;
+  --color-text-light: #f5f5f5;
+  --color-bg: #f5f7fa;
+  --color-card: #ffffff;
+}
+
+.ayuda-inteligente-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.ayuda-bloque {
+  background-color: var(--color-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ayuda-bloque:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.ayuda-header {
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-light);
+  padding-bottom: 1rem;
+}
+
+.ayuda-header h2 {
+  color: var(--color-primary);
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modo-seleccion {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.modo-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--color-light);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.modo-btn.active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.modo-btn:not(.active):hover {
+  background-color: #e0e0e0;
+}
+
+.camara-container,
+.subir-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+video {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  background-color: #000;
+}
+
+.camara-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.btn-primario {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primario:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropzone {
+  border: 2px dashed var(--color-primary);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  background-color: rgba(74, 111, 165, 0.05);
+}
+
+.dropzone:hover {
+  background-color: rgba(74, 111, 165, 0.1);
+}
+
+.dropzone i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.dropzone p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.resultado-container {
+  margin-top: auto;
+}
+
+.resultado-texto {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: var(--color-light);
+  border-radius: 8px;
+}
+
+.info-nutricional {
+  background-color: var(--color-light);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.info-nutricional h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+.info-nutricional ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-nutricional li {
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-nutricional li strong {
+  color: var(--color-secondary);
+}
+
+.select-ejercicio {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--color-light);
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1rem;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.select-ejercicio:hover {
+  border-color: var(--color-primary);
+}
+
+.feedback-container {
+  margin-top: 1rem;
+}
+
+.feedback-texto {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.feedback-visual {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.puntuacion-bar {
+  flex-grow: 1;
+  height: 10px;
+  background-color: var(--color-light);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.puntuacion-fill {
+  height: 100%;
+  width: 0%;
+  background-color: var(--color-success);
+  transition: width 0.5s ease;
+}
+
+.ejercicio-guia {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--color-light);
+  border-radius: 8px;
+}
+
+.ejercicio-guia h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+.instrucciones-texto {
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ayuda-inteligente-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .modo-seleccion {
+    flex-direction: column;
+  }
+}

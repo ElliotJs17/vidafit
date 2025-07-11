@@ -29,10 +29,10 @@ const ROUTES = {
     styles: "./css/pages/perfil.css",
     script: "./pages/perfil/perfil.js",
   },
-  ayudaInteligente: {
-    template: "./templates/ayudaInteligente.html",
-    styles: "./css/pages/ayudaInteligente.css",
-    script: "./pages/ayudaInteligente/ayudaInteligente.js",
+  "ayuda-inteligente": {
+    template: "./templates/ayuda-inteligente.html",
+    styles: "./css/pages/ayuda-inteligente.css",
+    script: "./pages/ayuda-inteligente/ayuda-inteligente.js",
   },
 };
 
