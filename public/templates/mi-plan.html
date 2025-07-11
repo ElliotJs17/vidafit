@@ -1,17 +1,13 @@
 <div class="mi-plan-page">
   <aside class="seleccion-sidebar">
     <div class="sidebar-header">
-      <h3><span class="icon-filter">➕</span> Agregar a Mi Plan</h3>
-      <p class="sidebar-subtitle">Arrastra elementos a tu plan semanal</p>
+      <h3><span class="icon-filter"></span> Agregar a Mi Plan</h3>
     </div>
 
     <div class="seleccion-container">
       <div class="tabs">
         <button class="tab-btn active" data-tab="recetas">🍽️ Recetas</button>
-        <!-- Asegurado texto correcto -->
-        <button class="tab-btn" data-tab="entrenamientos">
-          💪 Entrenamientos
-        </button>
+        <button class="tab-btn" data-tab="entrenamientos">💪 Entrenamientos</button>
       </div>
 
       <div id="recetas-tab" class="tab-content active">
@@ -23,6 +19,9 @@
           />
         </div>
         <div id="recetas-list" class="items-list"></div>
+        <button id="btn-agregar-recetas" class="btn btn-primary" style="margin-top: 1rem;">
+          Agregar Recetas al Plan
+        </button>
       </div>
 
       <div id="entrenamientos-tab" class="tab-content">
@@ -34,6 +33,9 @@
           />
         </div>
         <div id="entrenamientos-list" class="items-list"></div>
+        <button id="btn-agregar-entrenamientos" class="btn btn-primary" style="margin-top: 1rem;">
+          Agregar Entrenamientos al Plan
+        </button>
       </div>
     </div>
   </aside>
@@ -41,17 +43,13 @@
   <main class="mi-plan-content">
     <div class="mi-plan-header">
       <h2>Mi Plan Semanal</h2>
-      <div class="week-navigation">
-        <button id="prev-week">← Semana Anterior</button>
-        <span id="current-week"></span>
-        <button id="next-week">Semana Siguiente →</button>
-      </div>
       <button id="btn-estadisticas" class="btn btn-secondary">
-        Ver Estadísticas
+        Rutina de hoy
       </button>
     </div>
 
-    <div class="semana-grid" id="semana-grid"></div>
+    <!-- Calendario -->
+    <div id="calendar" style="margin: 2rem 0;"></div>
 
     <div class="resumen-nutricional">
       <div class="resumen-item">
@@ -73,33 +71,19 @@
     </div>
   </main>
 
-  <div class="modal-overlay" id="modal-estadisticas" style="display: none">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2>📊 Estadísticas Semanales</h2>
-        <button class="modal-close" id="close-estadisticas">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="stats-grid" id="stats-grid"></div>
-      </div>
+  <!-- Modal para mostrar la rutina del día -->
+  <div id="modal-rutina" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="cerrar-modal-rutina">&times;</span>
+      <h2>Rutina de Hoy</h2>
+      <div id="contenido-rutina-hoy"></div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="modal-detalles" style="display: none">
-    <div class="modal-container modal-details">
-      <div class="modal-header">
-        <h2 id="detalle-titulo">Detalles</h2>
-        <button class="modal-close" id="close-detalles">×</button>
-      </div>
-      <div class="modal-body" id="detalle-contenido"></div>
-    </div>
-  </div>
-
-  <!-- Añade un indicador de carga -->
+  <!-- Indicador de carga -->
   <div id="loading-indicator" class="loading-indicator" style="display: none">
     <div class="spinner"></div>
     <p>Cargando tu plan...</p>
   </div>
 </div>
 
-<div id="calendar" style="margin: 2rem 0;"></div>

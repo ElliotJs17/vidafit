@@ -17,21 +17,26 @@ export async function loadUserPlan(userId, weekId) {
     if (plan) {
       currentPlan = plan;
     } else {
+      const fechaInicio = new Date(weekId);
       currentPlan = {
         id: planId,
-        userId: userId,
-        weekId: weekId,
-        nombre: `Plan Semanal ${new Date(weekId).toLocaleDateString()}`,
-        dias: DIAS_SEMANA.map((dia) => ({
-          fecha: dia.id,
-          comidas: TIPOS_COMIDA.map((tipo) => ({
-            tipo: tipo.id,
-            receta: null,
-          })),
-          entrenamientos: [],
-        })),
+        userId,
+        weekId,
+        nombre: `Plan Semanal ${fechaInicio.toLocaleDateString()}`,
+        dias: Array.from({ length: 7 }, (_, i) => {
+          const fecha = new Date(fechaInicio.getTime() + i * 86400000);
+          return {
+            fecha: fecha.toISOString().split("T")[0], // ✅ correcto
+            comidas: TIPOS_COMIDA.map((tipo) => ({
+              tipo: tipo.id,
+              receta: null,
+            })),
+            entrenamientos: [],
+          };
+        }),
         createdAt: new Date().toISOString(),
       };
+
       await savePlan(currentPlan);
       showSuccess("¡Nuevo plan creado!");
     }
@@ -43,6 +48,9 @@ export async function loadUserPlan(userId, weekId) {
     throw error;
   }
 }
+
+
+
 
 export function getCurrentPlan() {
   return currentPlan;

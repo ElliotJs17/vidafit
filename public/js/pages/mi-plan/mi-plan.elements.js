@@ -10,22 +10,15 @@ const elements = {
   buscarEntrenamientos: document.getElementById("buscar-entrenamientos"),
 
   // Plan semanal
-  semanaGrid: document.getElementById("semana-grid"),
-  currentWeek: document.getElementById("current-week"),
-  prevWeek: document.getElementById("prev-week"),
-  nextWeek: document.getElementById("next-week"),
+  currentWeek: document.getElementById("current-week") || null,
+  prevWeek: document.getElementById("prev-week") || null,
+  nextWeek: document.getElementById("next-week") || null,
 
-  // Estadísticas
-  btnEstadisticas: document.getElementById("btn-estadisticas"),
-  modalEstadisticas: document.getElementById("modal-estadisticas"),
-  closeEstadisticas: document.getElementById("close-estadisticas"),
-  statsGrid: document.getElementById("stats-grid"),
+  //Botones de recetas y elements 
+  btnAgregarRecetas: document.getElementById("btn-agregar-recetas"),
+  btnAgregarEntrenamientos: document.getElementById("btn-agregar-entrenamientos"),
+   btnEstadisticas: document.getElementById("btn-estadisticas"),
 
-  // Detalles
-  modalDetalles: document.getElementById("modal-detalles"),
-  closeDetalles: document.getElementById("close-detalles"),
-  detalleTitulo: document.getElementById("detalle-titulo"),
-  detalleContenido: document.getElementById("detalle-contenido"),
 
   // Resumen nutricional
   totalCalorias: document.getElementById("total-calorias"),
