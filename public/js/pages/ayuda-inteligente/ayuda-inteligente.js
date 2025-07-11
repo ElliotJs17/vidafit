@@ -315,6 +315,11 @@ export default async function () {
     if (modeloEjercicio) return modeloEjercicio;
 
     try {
+      // Limpiar el contexto de TensorFlow.js si es necesario
+      if (window.tf && window.tf.disposeVariables) {
+        window.tf.disposeVariables();
+      }
+
       const modelURL =
         "https://teachablemachine.withgoogle.com/models/_s2kqbYtw/model.json";
       const metadataURL =
@@ -700,6 +705,9 @@ export default async function () {
       isAnalyzing = false;
       if (loopEjercicio) {
         cancelAnimationFrame(loopEjercicio);
+      }
+      if (window.tf) {
+        window.tf.disposeVariables(); // Limpiar variables
       }
       modeloComida = null;
       modeloEjercicio = null;
