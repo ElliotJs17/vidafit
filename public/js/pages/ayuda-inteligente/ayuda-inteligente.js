@@ -4,7 +4,7 @@ export default async function () {
     // Cargar TensorFlow.js primero
     const tfScript = document.createElement("script");
     tfScript.src =
-      "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js";
+      "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js";
     document.head.appendChild(tfScript);
 
     await new Promise((resolve, reject) => {
