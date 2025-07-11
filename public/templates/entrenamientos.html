@@ -1,49 +1,478 @@
-<div class="container">
-        <div class="main-content">
-            <div class="header">
-                <h1>🏋️‍♂️ VidaFit</h1>
-                <p>Crea tu rutina de entrenamiento personalizada</p>
-            </div>
-            <div class="filtros-section">
-                <h2>🎯 Filtrar entrenamientos</h2>
-                <div class="filtros-container">
-                    <button class="filtro-btn activo" data-tipo="todos">Todos</button>
-                    <button class="filtro-btn" data-tipo="cardio">Cardio</button>
-                    <button class="filtro-btn" data-tipo="fuerza">Fuerza</button>
-                    <button class="filtro-btn" data-tipo="flexibilidad">Flexibilidad</button>
-                    <button class="filtro-btn" data-tipo="yoga">Yoga</button>
-                    <button class="filtro-btn" data-tipo="hiit">HIIT</button>
-                    <button class="filtro-btn" data-tipo="pilates">Pilates</button>
-                </div>
-            </div>
-
-            <div class="contador-section">
-                <div class="contador" id="contador-seleccionados">
-                    <span class="contador-numero">0</span>
-                    <span>entrenamientos seleccionados</span>
-                </div>
-            </div>
-
-            <div id="lista-entrenamientos">
-                <div class="loading">Cargando entrenamientos...</div>
-            </div>
-        </div>
-
-        <div class="sidebar">
-            <div class="vista-previa" id="vista-previa-rutina">
-                <h3>📝 Rutina personalizada</h3>
-                <div id="entrenamientos-seleccionados">
-                    <div class="rutina-empty">
-                        Selecciona entrenamientos para crear tu rutina personalizada
-                    </div>
-                </div>
-
-                <div class="acciones-rutina">
-                    <input type="text" id="nombre-rutina" placeholder="Nombre de tu rutina (ej. Rutina Matutina)" />
-                    <button class="btn-guardar" id="guardar-rutina-btn" disabled>
-                        💾 Guardar Rutina
-                    </button>
-                </div>
-            </div>
-        </div>
+<div class="entrenamientos-page">
+  <!-- Sidebar de filtrado -->
+  <aside class="filtros-sidebar">
+    <div class="sidebar-header">
+      <h3><span class="icon-filter">🔍</span> Filtrar Entrenamientos</h3>
+      <p class="sidebar-subtitle">
+        Encuentra entrenamientos según tus objetivos
+      </p>
     </div>
+
+    <div class="filtros-container">
+      <div class="filtro-group">
+        <label for="filtro-tipo" class="filtro-label">
+          <span class="icon-label">🏋️</span> Tipo
+        </label>
+        <select id="filtro-tipo" class="filtro-select">
+          <option value="">Todos los tipos</option>
+          <option value="Cardio">🏃 Cardio</option>
+          <option value="Fuerza">💪 Fuerza</option>
+          <option value="HIIT">⚡ HIIT</option>
+          <option value="Yoga">🧘 Yoga</option>
+        </select>
+      </div>
+
+      <div class="filtro-group">
+        <label for="filtro-nivel" class="filtro-label">
+          <span class="icon-label">📊</span> Nivel
+        </label>
+        <select id="filtro-nivel" class="filtro-select">
+          <option value="">Todos los niveles</option>
+          <option value="Principiante">⭐ Principiante</option>
+          <option value="Intermedio">⭐⭐ Intermedio</option>
+          <option value="Avanzado">⭐⭐⭐ Avanzado</option>
+        </select>
+      </div>
+
+      <div class="filtro-group">
+        <label for="filtro-duracion" class="filtro-label">
+          <span class="icon-label">⏱️</span> Duración máxima
+        </label>
+        <select id="filtro-duracion" class="filtro-select">
+          <option value="">Cualquier duración</option>
+          <option value="15">⚡ Hasta 15 min</option>
+          <option value="30">🕐 Hasta 30 min</option>
+          <option value="60">🕑 Hasta 1 hora</option>
+        </select>
+      </div>
+
+      <div class="filtro-group">
+        <label for="filtro-equipamiento" class="filtro-label">
+          <span class="icon-label">🏋️‍♂️</span> Equipamiento
+        </label>
+        <select id="filtro-equipamiento" class="filtro-select">
+          <option value="">Cualquier equipamiento</option>
+          <option value="Ninguno">🚶 Ninguno (solo cuerpo)</option>
+          <option value="Básico">🏠 Básico (en casa)</option>
+          <option value="Gimnasio">🏋️‍♂️ Gimnasio completo</option>
+        </select>
+      </div>
+
+      <button
+        id="limpiar-filtros"
+        class="btn-limpiar"
+        aria-label="Limpiar todos los filtros"
+      >
+        <span class="btn-icon">🗑️</span>
+        <span class="btn-text">Limpiar Filtros</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main class="entrenamientos-content">
+    <header class="repo-header">
+      <div class="header-left">
+        <h1>
+          <span class="icon-title">📖</span> Repositorio de Entrenamientos
+        </h1>
+        <p class="subtitle">
+          Descubre, crea y comparte tus rutinas de ejercicio
+        </p>
+      </div>
+      <div class="search-container">
+        <div class="search-box" role="search">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Buscar entrenamientos, ejercicios..."
+            aria-label="Buscar entrenamientos"
+          />
+          <button id="search-btn" type="button" aria-label="Buscar">
+            <span class="search-icon">🔍</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contador de resultados -->
+    <div
+      class="results-info"
+      id="results-info"
+      style="display: none"
+      aria-live="polite"
+    >
+      <span class="results-count" id="results-count">0</span>
+      <span class="results-text">entrenamientos encontrados</span>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-state" id="loading-state" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-text">Cargando entrenamientos...</p>
+    </div>
+
+    <!-- Listado de entrenamientos -->
+    <section
+      class="entrenamientos-grid"
+      id="entrenamientos-grid"
+      aria-label="Listado de entrenamientos"
+    >
+      <!-- Los entrenamientos se cargarán dinámicamente -->
+    </section>
+
+    <!-- Estado vacío -->
+    <div
+      class="empty-state"
+      id="empty-state"
+      style="display: none"
+      aria-live="polite"
+    >
+      <div class="empty-illustration">
+        <div class="empty-icon" aria-hidden="true">🏋️</div>
+      </div>
+      <h3 class="empty-title">¡Tu repositorio está vacío!</h3>
+      <p class="empty-message">Comienza creando tu primer entrenamiento</p>
+      <button
+        id="btn-crear-vacio"
+        class="btn-crear-vacio"
+        aria-label="Crear primer entrenamiento"
+      >
+        <span class="btn-icon">✨</span>
+        <span class="btn-text">Crear mi primer entrenamiento</span>
+      </button>
+    </div>
+
+    <!-- Sin resultados -->
+    <div
+      class="no-results"
+      id="no-results"
+      style="display: none"
+      aria-live="polite"
+    >
+      <div class="no-results-icon" aria-hidden="true">🔍</div>
+      <h3 class="no-results-title">No se encontraron entrenamientos</h3>
+      <p class="no-results-message">
+        Intenta con otros términos de búsqueda o ajusta los filtros
+      </p>
+    </div>
+
+    <!-- Botón flotante -->
+    <button
+      id="abrir-modal"
+      class="btn-crear-floating"
+      aria-label="Crear nuevo entrenamiento"
+    >
+      <span class="btn-icon">+</span>
+      <span class="btn-text">Nuevo Entrenamiento</span>
+    </button>
+  </main>
+</div>
+
+<!-- Modal para crear/editar entrenamiento -->
+<div
+  class="modal-overlay"
+  id="modal-entrenamiento"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  style="display: none"
+>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 id="modal-title" class="modal-title">✨ Crear Nuevo Entrenamiento</h2>
+      <button
+        class="modal-close"
+        id="close-modal"
+        type="button"
+        aria-label="Cerrar modal"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form id="form-entrenamiento" class="form-entrenamiento">
+        <!-- Información básica -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">📝</span> Información Básica
+          </h3>
+
+          <div class="form-group">
+            <label for="entrenamiento-imagen" class="form-label">
+              <span class="label-icon">🖼️</span> Imagen del entrenamiento
+            </label>
+            <input
+              type="file"
+              id="entrenamiento-imagen"
+              class="form-input"
+              accept="image/*"
+              aria-describedby="image-help"
+            />
+            <small id="image-help" class="form-help">
+              Sube una imagen representativa de tu entrenamiento (opcional)
+            </small>
+            <div
+              id="imagen-preview"
+              class="image-preview"
+              style="display: none"
+            >
+              <img id="preview-img" src="" alt="Vista previa de la imagen" />
+              <button
+                type="button"
+                id="eliminar-imagen"
+                class="btn-eliminar-imagen"
+              >
+                × Eliminar imagen
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="entrenamiento-nombre" class="form-label">
+                <span class="label-icon">🏋️</span> Nombre del entrenamiento *
+              </label>
+              <input
+                type="text"
+                id="entrenamiento-nombre"
+                class="form-input"
+                placeholder="Ej: Rutina HIIT para principiantes"
+                required
+                aria-required="true"
+              />
+            </div>
+            <div class="form-group">
+              <label for="entrenamiento-tipo" class="form-label">
+                <span class="label-icon">🏷️</span> Tipo *
+              </label>
+              <select
+                id="entrenamiento-tipo"
+                class="form-select"
+                required
+                aria-required="true"
+              >
+                <option value="">Seleccionar tipo</option>
+                <option value="Cardio">🏃 Cardio</option>
+                <option value="Fuerza">💪 Fuerza</option>
+                <option value="HIIT">⚡ HIIT</option>
+                <option value="Yoga">🧘 Yoga</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="entrenamiento-desc" class="form-label">
+              <span class="label-icon">📄</span> Descripción *
+            </label>
+            <textarea
+              id="entrenamiento-desc"
+              class="form-textarea"
+              rows="3"
+              placeholder="Describe tu entrenamiento y sus beneficios..."
+              required
+              aria-required="true"
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="entrenamiento-duracion" class="form-label">
+                <span class="label-icon">⏱️</span> Duración (min) *
+              </label>
+              <input
+                type="number"
+                id="entrenamiento-duracion"
+                class="form-input"
+                min="1"
+                max="300"
+                required
+                aria-required="true"
+              />
+            </div>
+            <div class="form-group">
+              <label for="entrenamiento-nivel" class="form-label">
+                <span class="label-icon">📊</span> Nivel *
+              </label>
+              <select
+                id="entrenamiento-nivel"
+                class="form-select"
+                required
+                aria-required="true"
+              >
+                <option value="">Seleccionar nivel</option>
+                <option value="Principiante">⭐ Principiante</option>
+                <option value="Intermedio">⭐⭐ Intermedio</option>
+                <option value="Avanzado">⭐⭐⭐ Avanzado</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="entrenamiento-equipamiento" class="form-label">
+              <span class="label-icon">🏋️‍♂️</span> Equipamiento necesario
+            </label>
+            <input
+              type="text"
+              id="entrenamiento-equipamiento"
+              class="form-input"
+              placeholder="Ej: Mancuernas, colchoneta, banda elástica"
+            />
+          </div>
+        </div>
+
+        <!-- Ejercicios -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">💪</span> Ejercicios
+          </h3>
+          <div
+            id="ejercicios-container"
+            class="dynamic-container"
+            aria-live="polite"
+          >
+            <!-- Los ejercicios se añadirán dinámicamente -->
+          </div>
+          <button
+            type="button"
+            id="agregar-ejercicio"
+            class="btn-add-item"
+            aria-label="Añadir nuevo ejercicio"
+          >
+            <span class="btn-icon">+</span>
+            <span class="btn-text">Añadir Ejercicio</span>
+          </button>
+        </div>
+
+        <!-- Métricas -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">🔥</span> Métricas
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="entrenamiento-calorias" class="form-label">
+                <span class="label-icon">⚡</span> Calorías estimadas
+              </label>
+              <input
+                type="number"
+                id="entrenamiento-calorias"
+                class="form-input"
+                min="1"
+                max="2000"
+              />
+            </div>
+            <div class="form-group">
+              <label for="entrenamiento-objetivo" class="form-label">
+                <span class="label-icon">🎯</span> Objetivo principal
+              </label>
+              <select id="entrenamiento-objetivo" class="form-select">
+                <option value="Pérdida de grasa">🔥 Pérdida de grasa</option>
+                <option value="Ganancia muscular">💪 Ganancia muscular</option>
+                <option value="Resistencia">🏃 Resistencia</option>
+                <option value="Flexibilidad">🧘 Flexibilidad</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">👨‍🏫</span> Instrucciones
+          </h3>
+          <div
+            id="instrucciones-container"
+            class="dynamic-container"
+            aria-live="polite"
+          >
+            <!-- Las instrucciones se añadirán dinámicamente -->
+          </div>
+          <button
+            type="button"
+            id="agregar-instruccion"
+            class="btn-add-item"
+            aria-label="Añadir nueva instrucción"
+          >
+            <span class="btn-icon">+</span>
+            <span class="btn-text">Añadir Instrucción</span>
+          </button>
+        </div>
+
+        <!-- Palabras clave -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="section-icon">🏷️</span> Etiquetas
+          </h3>
+          <div class="form-group">
+            <label for="entrenamiento-keywords" class="form-label">
+              <span class="label-icon">🔖</span> Palabras clave (separadas por
+              comas)
+            </label>
+            <input
+              type="text"
+              id="entrenamiento-keywords"
+              class="form-input"
+              placeholder="Ej: casa, principiante, cardio, full-body"
+              aria-describedby="keywords-help"
+            />
+            <small id="keywords-help" class="form-help">
+              Ayuda a otros usuarios a encontrar tu entrenamiento
+            </small>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            onclick="closeModal()"
+            aria-label="Cancelar y cerrar formulario"
+          >
+            <span class="btn-icon">✖</span>
+            <span class="btn-text">Cancelar</span>
+          </button>
+          <button
+            type="submit"
+            class="btn-save"
+            aria-label="Guardar entrenamiento"
+          >
+            <span class="btn-icon">💾</span>
+            <span class="btn-text">Guardar Entrenamiento</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para ver detalles de entrenamiento -->
+<div
+  class="modal-overlay"
+  id="modal-detalles"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="detalle-titulo"
+  style="display: none"
+>
+  <div class="modal-container modal-details">
+    <div class="modal-header">
+      <h2 id="detalle-titulo" class="modal-title">
+        Detalles del Entrenamiento
+      </h2>
+      <button
+        class="modal-close"
+        onclick="closeDetallesModal()"
+        type="button"
+        aria-label="Cerrar detalles"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body" id="detalle-contenido" aria-live="polite">
+      <!-- El contenido se cargará dinámicamente -->
+    </div>
+  </div>
+</div>
