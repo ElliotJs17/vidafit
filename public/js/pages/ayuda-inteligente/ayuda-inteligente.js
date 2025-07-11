@@ -100,6 +100,51 @@ export default async function () {
   const puntuacionEjercicio = document.getElementById("puntuacionEjercicio");
   const puntuacionTexto = document.getElementById("puntuacionTexto");
 
+  // Crear botones de control de cámara
+  const activarCamaraComidaBtn = document.createElement("button");
+  activarCamaraComidaBtn.innerHTML =
+    '<i class="fas fa-video"></i> Activar Cámara';
+  activarCamaraComidaBtn.className = "btn btn-primary";
+  activarCamaraComidaBtn.id = "activarCamaraComida";
+  activarCamaraComidaBtn.style.marginBottom = "10px";
+
+  const detenerCamaraComidaBtn = document.createElement("button");
+  detenerCamaraComidaBtn.innerHTML =
+    '<i class="fas fa-video-slash"></i> Detener Cámara';
+  detenerCamaraComidaBtn.className = "btn btn-secondary";
+  detenerCamaraComidaBtn.id = "detenerCamaraComida";
+  detenerCamaraComidaBtn.style.marginBottom = "10px";
+  detenerCamaraComidaBtn.style.display = "none";
+
+  // Insertar botones antes del contenedor de cámara
+  camaraComidaContainer.parentNode.insertBefore(
+    activarCamaraComidaBtn,
+    camaraComidaContainer
+  );
+  camaraComidaContainer.parentNode.insertBefore(
+    detenerCamaraComidaBtn,
+    camaraComidaContainer
+  );
+
+  // Crear preview de imagen subida
+  const previewContainer = document.createElement("div");
+  previewContainer.id = "previewContainer";
+  previewContainer.style.display = "none";
+  previewContainer.style.marginTop = "10px";
+  previewContainer.style.textAlign = "center";
+  previewContainer.innerHTML = `
+    <h4>Imagen cargada:</h4>
+    <img id="imagePreview" style="max-width: 100%; max-height: 300px; border: 1px solid #ddd; border-radius: 8px;">
+    <br>
+    <button id="analizarImagenBtn" class="btn btn-primary" style="margin-top: 10px;">
+      <i class="fas fa-search"></i> Analizar Imagen
+    </button>
+  `;
+  subirComidaContainer.appendChild(previewContainer);
+
+  const imagePreview = document.getElementById("imagePreview");
+  const analizarImagenBtn = document.getElementById("analizarImagenBtn");
+
   // === ESTADO ===
   let modeloComida = null;
   let modeloEjercicio = null;
@@ -108,10 +153,20 @@ export default async function () {
   let loopEjercicio = null;
   let ejercicioActual = null;
   let isAnalyzing = false;
+  let camaraComidaActiva = false;
+  let camaraEjercicioActiva = false;
+  let imagenCargada = null;
 
   // === FUNCIONES COMIDA ===
   async function iniciarCamaraComida() {
     try {
+      if (camaraEjercicioActiva) {
+        alert(
+          "La cámara ya está siendo utilizada por el entrenador postural. Detén primero ese análisis."
+        );
+        return false;
+      }
+
       if (streamComida) {
         streamComida.getTracks().forEach((track) => track.stop());
       }
@@ -129,6 +184,14 @@ export default async function () {
       canvasComida.width = settings.width || 1280;
       canvasComida.height = settings.height || 720;
 
+      camaraComidaActiva = true;
+      activarCamaraComidaBtn.style.display = "none";
+      detenerCamaraComidaBtn.style.display = "inline-block";
+      camaraComidaContainer.style.display = "flex";
+
+      resultadoComida.textContent =
+        "Cámara activada. Posiciona la comida y haz clic en 'Capturar' para analizarla.";
+
       return true;
     } catch (e) {
       console.error("Error al acceder a la cámara de comida:", e);
@@ -144,6 +207,12 @@ export default async function () {
       streamComida = null;
       videoComida.srcObject = null;
     }
+    camaraComidaActiva = false;
+    activarCamaraComidaBtn.style.display = "inline-block";
+    detenerCamaraComidaBtn.style.display = "none";
+    camaraComidaContainer.style.display = "none";
+    resultadoComida.textContent =
+      "Cámara detenida. Haz clic en 'Activar Cámara' para usar la cámara nuevamente.";
   }
 
   async function cargarModeloComida() {
@@ -166,8 +235,12 @@ export default async function () {
 
   async function procesarImagenComida(imageElement) {
     try {
-      if (!modeloComida) await cargarModeloComida();
+      if (!modeloComida) {
+        resultadoComida.textContent = "Cargando modelo de análisis...";
+        await cargarModeloComida();
+      }
 
+      resultadoComida.textContent = "Analizando imagen...";
       const pred = await modeloComida.predict(imageElement);
       pred.sort((a, b) => b.probability - a.probability);
 
@@ -264,6 +337,13 @@ export default async function () {
   // === FUNCIONES EJERCICIOS ===
   async function iniciarCamaraEjercicio() {
     try {
+      if (camaraComidaActiva) {
+        alert(
+          "La cámara ya está siendo utilizada por el identificador de comidas. Detén primero ese análisis."
+        );
+        return false;
+      }
+
       if (streamEjercicio) {
         streamEjercicio.getTracks().forEach((track) => track.stop());
       }
@@ -276,6 +356,8 @@ export default async function () {
         },
       });
       videoEjercicio.srcObject = streamEjercicio;
+
+      camaraEjercicioActiva = true;
 
       // Esperar a que el video esté completamente cargado
       return new Promise((resolve, reject) => {
@@ -308,6 +390,7 @@ export default async function () {
       cancelAnimationFrame(loopEjercicio);
       loopEjercicio = null;
     }
+    camaraEjercicioActiva = false;
     isAnalyzing = false;
   }
 
@@ -566,7 +649,22 @@ export default async function () {
   }
 
   // === MANEJADORES DE EVENTOS ===
+
+  // Botones de control de cámara de comida
+  activarCamaraComidaBtn.addEventListener("click", async () => {
+    await iniciarCamaraComida();
+  });
+
+  detenerCamaraComidaBtn.addEventListener("click", () => {
+    detenerCamaraComida();
+  });
+
   capturarComida.addEventListener("click", async () => {
+    if (!camaraComidaActiva) {
+      alert("Primero debes activar la cámara.");
+      return;
+    }
+
     try {
       capturarComida.disabled = true;
       capturarComida.innerHTML =
@@ -596,40 +694,48 @@ export default async function () {
     }
   });
 
-  modoBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      modoBtns.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      if (btn.dataset.modo === "camara") {
-        camaraComidaContainer.style.display = "flex";
-        subirComidaContainer.style.display = "none";
-        iniciarCamaraComida();
-      } else {
-        camaraComidaContainer.style.display = "none";
-        subirComidaContainer.style.display = "flex";
-        detenerCamaraComida();
-      }
-    });
-  });
-
-  dropzoneComida.addEventListener("click", () => inputFileComida.click());
-
+  // Manejo de subida de imágenes
   inputFileComida.addEventListener("change", async (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const img = new Image();
+      const reader = new FileReader();
 
-      img.onload = async () => {
-        canvasComida.width = img.width;
-        canvasComida.height = img.height;
-        ctxComida.drawImage(img, 0, 0);
-        await procesarImagenComida(img);
+      reader.onload = (event) => {
+        imagePreview.src = event.target.result;
+        previewContainer.style.display = "block";
+        imagenCargada = imagePreview;
+        resultadoComida.textContent =
+          "Imagen cargada. Haz clic en 'Analizar Imagen' para procesarla.";
       };
 
-      img.src = URL.createObjectURL(file);
+      reader.readAsDataURL(file);
     }
   });
+
+  analizarImagenBtn.addEventListener("click", async () => {
+    if (!imagenCargada) {
+      alert("Primero debes cargar una imagen.");
+      return;
+    }
+
+    try {
+      analizarImagenBtn.disabled = true;
+      analizarImagenBtn.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i> Analizando...';
+
+      await procesarImagenComida(imagenCargada);
+    } catch (error) {
+      console.error("Error al analizar imagen:", error);
+      resultadoComida.textContent =
+        "Error al analizar la imagen. Intenta con otra foto.";
+    } finally {
+      analizarImagenBtn.disabled = false;
+      analizarImagenBtn.innerHTML =
+        '<i class="fas fa-search"></i> Analizar Imagen';
+    }
+  });
+
+  dropzoneComida.addEventListener("click", () => inputFileComida.click());
 
   dropzoneComida.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -649,6 +755,40 @@ export default async function () {
       const event = new Event("change");
       inputFileComida.dispatchEvent(event);
     }
+  });
+
+  modoBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      modoBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      if (btn.dataset.modo === "camara") {
+        // Mostrar controles de cámara
+        activarCamaraComidaBtn.style.display = "inline-block";
+        detenerCamaraComidaBtn.style.display = camaraComidaActiva
+          ? "inline-block"
+          : "none";
+        camaraComidaContainer.style.display = camaraComidaActiva
+          ? "flex"
+          : "none";
+        subirComidaContainer.style.display = "none";
+        previewContainer.style.display = "none";
+
+        if (!camaraComidaActiva) {
+          resultadoComida.textContent =
+            "Haz clic en 'Activar Cámara' para comenzar.";
+        }
+      } else {
+        // Modo subir imagen
+        activarCamaraComidaBtn.style.display = "none";
+        detenerCamaraComidaBtn.style.display = "none";
+        camaraComidaContainer.style.display = "none";
+        subirComidaContainer.style.display = "flex";
+        detenerCamaraComida();
+        resultadoComida.textContent =
+          "Arrastra una imagen o haz clic para seleccionar una.";
+      }
+    });
   });
 
   ejercicioSeleccionado.addEventListener("change", async (e) => {
@@ -675,8 +815,6 @@ export default async function () {
   // === INICIALIZACIÓN ===
   async function inicializar() {
     try {
-      await iniciarCamaraComida();
-
       // Precargar modelos en segundo plano
       setTimeout(() => {
         cargarModeloComida().catch((e) =>
@@ -687,9 +825,13 @@ export default async function () {
         );
       }, 2000);
 
+      // Configurar estado inicial
       resultadoComida.textContent =
-        "Toma una foto de tu comida o sube una imagen para analizarla.";
+        "Selecciona un modo para analizar tu comida.";
       resultadoEjercicio.textContent = "Selecciona un ejercicio para comenzar.";
+
+      // Mostrar modo subir imagen por defecto
+      modoBtns[1].click();
     } catch (error) {
       console.error("Error en inicialización:", error);
     }
