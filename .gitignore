@@ -1,0 +1,23 @@
+# Ignorar node_modules (todas las dependencias instaladas)
+node_modules/
+
+# Ignorar archivo de configuración de entorno
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Archivos de producción/compilados (opcional si generas builds)
+dist/
+build/
