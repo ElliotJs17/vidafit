@@ -7,10 +7,7 @@
     <div class="seleccion-container">
       <div class="tabs">
         <button class="tab-btn active" data-tab="recetas">🍽️ Recetas</button>
-        <!-- Asegurado texto correcto -->
-        <button class="tab-btn" data-tab="entrenamientos">
-          💪 Entrenamientos
-        </button>
+        <button class="tab-btn" data-tab="entrenamientos">💪 Entrenamientos</button>
       </div>
 
       <div id="recetas-tab" class="tab-content active">
@@ -22,6 +19,9 @@
           />
         </div>
         <div id="recetas-list" class="items-list"></div>
+        <button id="btn-agregar-recetas" class="btn btn-primary" style="margin-top: 1rem;">
+          Agregar Recetas al Plan
+        </button>
       </div>
 
       <div id="entrenamientos-tab" class="tab-content">
@@ -33,26 +33,23 @@
           />
         </div>
         <div id="entrenamientos-list" class="items-list"></div>
+        <button id="btn-agregar-entrenamientos" class="btn btn-primary" style="margin-top: 1rem;">
+          Agregar Entrenamientos al Plan
+        </button>
       </div>
-      <!-- Dentro de #recetas-tab -->
-      <button id="btn-agregar-recetas" class="btn btn-primary" style="margin-top: 1rem;">Agregar Recetas al Plan</button>
-
-      <!-- Dentro de #entrenamientos-tab -->
-      <button id="btn-agregar-entrenamientos" class="btn btn-primary" style="margin-top: 1rem;">Agregar Entrenamientos al Plan</button>
-
-          </div>
+    </div>
   </aside>
 
   <main class="mi-plan-content">
     <div class="mi-plan-header">
       <h2>Mi Plan Semanal</h2>
       <button id="btn-estadisticas" class="btn btn-secondary">
-        Sesión hoy
+        Rutina de hoy
       </button>
     </div>
-    <!--Calendario-->
+
+    <!-- Calendario -->
     <div id="calendar" style="margin: 2rem 0;"></div>
-    <!--Calendario anterior-->
 
     <div class="resumen-nutricional">
       <div class="resumen-item">
@@ -74,13 +71,19 @@
     </div>
   </main>
 
+  <!-- Modal para mostrar la rutina del día -->
+  <div id="modal-rutina" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="cerrar-modal-rutina">&times;</span>
+      <h2>Rutina de Hoy</h2>
+      <div id="contenido-rutina-hoy"></div>
+    </div>
+  </div>
 
-
-  <!-- Añade un indicador de carga -->
+  <!-- Indicador de carga -->
   <div id="loading-indicator" class="loading-indicator" style="display: none">
     <div class="spinner"></div>
     <p>Cargando tu plan...</p>
   </div>
 </div>
-
 

@@ -261,6 +261,68 @@ function setupEventListeners() {
     );
     renderEntrenamientosList(filteredEntrenamientos);
   });
+
+  elements.btnEstadisticas.addEventListener("click", () => {
+  const hoy = new Date().toISOString().split("T")[0];
+  const plan = getCurrentPlan();
+  const diaHoy = plan.dias.find((d) => d.fecha === hoy);
+
+  if (!diaHoy) {
+    showError("No hay plan para hoy.");
+    return;
+  }
+
+  const recetas = diaHoy.comidas || [];
+  const entrenamientos = diaHoy.entrenamientos || [];
+
+  let html = "";
+
+  if (recetas.length > 0) {
+    html += "<h4>Comidas</h4><ul>";
+    recetas.forEach((c) => {
+      html += `<li><strong>${c.tipo}</strong>: ${c.receta?.nombre || "Sin receta"}</li>`;
+    });
+    html += "</ul>";
+  } else {
+    html += "<p>No hay comidas asignadas.</p>";
+  }
+
+  if (entrenamientos.length > 0) {
+    html += "<h4>Entrenamientos</h4><ul>";
+    entrenamientos.forEach((e) => {
+      html += `<li>
+        <strong>${e.nombre}</strong><br>
+        ⏱️ <strong>Duración:</strong> ${e.duracion || "N/A"} min |
+        🔥 <strong>Calorías:</strong> ${e.calorias || 0} cal<br>
+        🏋️ <strong>Tipo:</strong> ${e.tipo || "N/A"} |
+        🎯 <strong>Objetivo:</strong> ${e.objetivo || "N/A"} |
+        💪 <strong>Nivel:</strong> ${e.nivel || "N/A"}
+      </li>`;
+    });
+    html += "</ul>";
+  }
+
+  const contenedor = document.getElementById("contenido-rutina-hoy");
+  contenedor.innerHTML = html;
+
+  // ✅ Mostrar el modal centrado
+  const modal = document.getElementById("modal-rutina");
+  modal.style.display = "block";
+});
+
+// ✅ Cierre del modal (fuera del botón)
+document.getElementById("cerrar-modal-rutina").addEventListener("click", () => {
+  document.getElementById("modal-rutina").style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+  const modal = document.getElementById("modal-rutina");
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+});
+
+
   /*
   // Modal estadísticas
   elements.btnEstadisticas.addEventListener("click", () => {

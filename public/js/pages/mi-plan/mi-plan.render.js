@@ -130,19 +130,23 @@ export function renderRecetasList(recetas) {
 
 
 export function renderEntrenamientosList(entrenamientos) {
-  elements.entrenamientosList.innerHTML = entrenamientos
-    .map(
-      (ent) => `
-        <div class="item-card entrenamiento-item" data-id="${ent.id}" data-type="entrenamiento">
-          <input type="checkbox" class="item-checkbox" />
-          <div class="entrenamiento-info">
-            <span class="name">${ent.nombre}</span>
-            <span>⏱️ ${ent.duracion} min | 🔥 ${ent.calorias || 0} cal</span>
-          </div>
+ elements.entrenamientosList.innerHTML = entrenamientos
+  .map(
+    (ent) => `
+      <div class="item-card entrenamiento-item" data-id="${ent.id}" data-type="entrenamiento">
+        <input type="checkbox" class="item-checkbox" />
+        <div class="entrenamiento-info">
+          <span class="name">${ent.nombre}</span>
+          <span>⏱️ ${ent.duracion} min | 🔥 ${ent.calorias || 0} cal</span>
+          <span>🏋️ Tipo: ${ent.tipo || "N/A"}</span>
+          <span>🎯 Objetivo: ${ent.objetivo || "N/A"}</span>
+          <span>💪 Nivel: ${ent.nivel || "N/A"}</span>
         </div>
-      `
-    )
-    .join("");
+      </div>
+    `
+  )
+  .join("");
+
 
   document.querySelectorAll(".entrenamiento-item").forEach((item) => {
     const ent = entrenamientos.find((e) => e.id === item.dataset.id);

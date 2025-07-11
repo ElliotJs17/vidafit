@@ -17,6 +17,7 @@ const elements = {
   //Botones de recetas y elements 
   btnAgregarRecetas: document.getElementById("btn-agregar-recetas"),
   btnAgregarEntrenamientos: document.getElementById("btn-agregar-entrenamientos"),
+   btnEstadisticas: document.getElementById("btn-estadisticas"),
 
 
   // Resumen nutricional
