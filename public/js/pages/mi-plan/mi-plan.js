@@ -1,5 +1,6 @@
 import elements from "./mi-plan.elements.js";
 import { DIAS_SEMANA, TIPOS_COMIDA } from "./mi-plan.constants.js";
+import { initCalendar } from "./calendar-init.js";
 import {
   initFirestore,
   getRecetasCollection,
@@ -48,6 +49,7 @@ async function init() {
 
     await loadInitialData();
     setupEventListeners();
+    initCalendar(); // Inicializar el calendario
   } catch (error) {
     console.error("Error inicializando Mi Plan:", error);
     showError("Ocurrió un error al iniciar la aplicación.");
@@ -367,3 +369,4 @@ function hideLoading() {
 
 // Inicializar la aplicación cuando el DOM esté completamente cargado
 document.addEventListener("DOMContentLoaded", init);
+export default init;
