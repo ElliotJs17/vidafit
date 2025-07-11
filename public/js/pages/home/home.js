@@ -1,5 +1,6 @@
+// public/js/pages/home/home.js
 export default function initHomePage() {
-  // Efecto hover para las tarjetas
+  // Efecto hover para tarjetas
   const featureCards = document.querySelectorAll(".feature-card");
   featureCards.forEach((card) => {
     card.addEventListener("mouseenter", () => {
@@ -10,4 +11,7 @@ export default function initHomePage() {
       card.style.transform = "scale(1)";
     });
   });
+
+  // Cargar lógicamente las funciones del chatbot
+  import("./chatbot.js"); // Esto solo las carga una vez
 }

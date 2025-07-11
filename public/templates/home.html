@@ -82,3 +82,47 @@
     >
   </section>
 </div>
+<!-- Botón flotante del chatbot -->
+    <button class="chatbot-button pulse" onclick="toggleChatbot()">
+        <span class="chatbot-icon">💪</span>
+    </button>
+
+    <!-- Ventana del chatbot -->
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <h3>
+                <span>💪</span>
+                GYM FIT Coach
+            </h3>
+            <button class="close-btn" onclick="closeChatbot()">&times;</button>
+        </div>
+        
+        <div class="chatbot-body">
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <h4>¡Hola! 🏋️‍♂️</h4>
+                    <p>Soy tu coach personal de GYM FIT. Estoy aquí para ayudarte con rutinas de ejercicio, consejos de nutrición y motivación para alcanzar tus objetivos fitness.</p>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="quick-action" onclick="sendQuickMessage('Rutina para principiantes')">🏃‍♂️ Principiante</button>
+                <button class="quick-action" onclick="sendQuickMessage('Ejercicios para abdominales')">🏋️‍♂️ Abdominales</button>
+                <button class="quick-action" onclick="sendQuickMessage('Desayuno saludable')">🥗 Nutrición</button>
+                <button class="quick-action" onclick="sendQuickMessage('Rutina de cardio')">❤️ Cardio</button>
+            </div>
+            
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Escribe tu pregunta sobre fitness..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    <span>➤</span>
+                </button>
+            </div>
+        </div>
+    </div>
